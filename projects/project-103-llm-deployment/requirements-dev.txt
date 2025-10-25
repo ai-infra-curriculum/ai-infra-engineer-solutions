@@ -1,0 +1,32 @@
+# Development and testing dependencies
+
+-r requirements.txt
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+pytest-timeout>=2.2.0
+httpx>=0.25.0
+
+# Code quality
+black>=23.11.0  # Code formatting
+isort>=5.12.0  # Import sorting
+flake8>=6.1.0  # Linting
+mypy>=1.7.0  # Type checking
+pylint>=3.0.0  # Linting
+
+# Documentation
+mkdocs>=1.5.0  # Documentation generation
+mkdocs-material>=9.4.0  # Material theme
+mkdocstrings[python]>=0.24.0  # API documentation
+
+# Profiling and debugging
+py-spy>=0.3.14  # Profiling
+memory-profiler>=0.61.0  # Memory profiling
+ipython>=8.17.0  # Interactive shell
+ipdb>=0.13.13  # Debugger
+
+# Utilities
+pre-commit>=3.5.0  # Git hooks

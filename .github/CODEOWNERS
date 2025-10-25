@@ -1,0 +1,32 @@
+# CODEOWNERS file for AI Infrastructure Engineer Solutions
+#
+# This file defines who owns different parts of the repository.
+# When a PR is opened, these users/teams will be automatically requested for review.
+#
+# More info: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+# Replace with actual GitHub usernames or team names
+*       @ai-infra-curriculum
+
+# Project-specific owners
+/projects/project-01-basic-model-serving/   @ai-infra-curriculum
+/projects/project-02-mlops-pipeline/        @ai-infra-curriculum
+/projects/project-03-llm-deployment/        @ai-infra-curriculum
+
+# Documentation owners
+/docs/                  @ai-infra-curriculum
+*.md                    @ai-infra-curriculum
+/guides/                @ai-infra-curriculum
+
+# CI/CD and infrastructure
+/.github/               @ai-infra-curriculum
+/kubernetes/            @ai-infra-curriculum
+/monitoring/            @ai-infra-curriculum
+docker-compose.yml      @ai-infra-curriculum
+Dockerfile              @ai-infra-curriculum
+
+# Configuration files
+requirements.txt        @ai-infra-curriculum
+requirements-dev.txt    @ai-infra-curriculum
+.env.example            @ai-infra-curriculum

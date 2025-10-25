@@ -1,0 +1,104 @@
+{
+  "dashboard": {
+    "title": "LLM Platform Overview",
+    "tags": ["llm", "ml", "gpu"],
+    "timezone": "browser",
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "title": "Request Rate",
+        "targets": [
+          {
+            "expr": "sum(rate(llm_requests_total[5m])) by (endpoint)",
+            "legendFormat": "{{endpoint}}"
+          }
+        ],
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "title": "Error Rate",
+        "targets": [
+          {
+            "expr": "sum(rate(llm_requests_total{status='error'}[5m])) / sum(rate(llm_requests_total[5m]))",
+            "legendFormat": "Error Rate"
+          }
+        ],
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "title": "Request Duration (P95)",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(llm_request_duration_seconds_bucket[5m])) by (endpoint, le))",
+            "legendFormat": "{{endpoint}} P95"
+          }
+        ],
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "title": "Tokens Per Second",
+        "targets": [
+          {
+            "expr": "llm_tokens_per_second",
+            "legendFormat": "{{model}}"
+          }
+        ],
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "title": "GPU Utilization",
+        "targets": [
+          {
+            "expr": "llm_gpu_utilization_percent",
+            "legendFormat": "GPU {{gpu_id}}"
+          }
+        ],
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "title": "GPU Memory Usage",
+        "targets": [
+          {
+            "expr": "llm_gpu_memory_used_bytes / llm_gpu_memory_total_bytes * 100",
+            "legendFormat": "GPU {{gpu_id}}"
+          }
+        ],
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      },
+      {
+        "title": "Estimated Cost (Hourly)",
+        "targets": [
+          {
+            "expr": "rate(llm_estimated_cost_usd_total[1h]) * 3600",
+            "legendFormat": "{{cost_type}}"
+          }
+        ],
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "title": "RAG Retrieval Performance",
+        "targets": [
+          {
+            "expr": "rate(llm_rag_retrievals_total[5m])",
+            "legendFormat": "Retrievals/sec"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(llm_rag_retrieval_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "P95 Duration"
+          }
+        ],
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      }
+    ]
+  }
+}

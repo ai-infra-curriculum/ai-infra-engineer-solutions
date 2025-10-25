@@ -1,0 +1,38 @@
+# LLM Serving
+vllm>=0.2.7  # High-performance LLM serving (requires GPU)
+transformers>=4.35.0  # Fallback for non-GPU
+torch>=2.1.0  # PyTorch
+accelerate>=0.24.0  # Model loading utilities
+
+# RAG and Embeddings
+sentence-transformers>=2.2.0  # Embedding models
+chromadb>=0.4.18  # Vector database (local)
+pinecone-client>=2.2.0  # Vector database (cloud, optional)
+
+# Document Processing
+pypdf>=3.17.0  # PDF loading
+beautifulsoup4>=4.12.0  # HTML parsing
+python-multipart>=0.0.6  # File uploads
+
+# API
+fastapi>=0.104.0  # Web framework
+uvicorn[standard]>=0.24.0  # ASGI server
+pydantic>=2.5.0  # Data validation
+python-jose[cryptography]>=3.3.0  # JWT tokens (optional)
+
+# Monitoring
+prometheus-client>=0.19.0  # Prometheus metrics
+psutil>=5.9.0  # System monitoring
+pynvml>=11.5.0  # GPU monitoring (requires NVIDIA drivers)
+
+# Utilities
+python-dotenv>=1.0.0  # Environment variables
+requests>=2.31.0  # HTTP client
+aiofiles>=23.2.1  # Async file operations
+numpy>=1.24.0  # Numerical operations
+
+# Testing (move to requirements-dev.txt in production)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+httpx>=0.25.0  # Async HTTP client for testing

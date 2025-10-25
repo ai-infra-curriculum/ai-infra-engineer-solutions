@@ -1,0 +1,79 @@
+# GPU Node Pool configuration for GKE
+# Adjust for your cloud provider (AWS, Azure, etc.)
+
+# For GKE:
+# gcloud container node-pools create gpu-pool \
+#   --cluster=llm-cluster \
+#   --zone=us-central1-a \
+#   --machine-type=n1-standard-4 \
+#   --accelerator=type=nvidia-tesla-t4,count=1 \
+#   --num-nodes=1 \
+#   --min-nodes=0 \
+#   --max-nodes=3 \
+#   --enable-autoscaling \
+#   --disk-size=100 \
+#   --disk-type=pd-standard \
+#   --node-labels=workload=gpu,gpu-type=t4 \
+#   --node-taints=nvidia.com/gpu=present:NoSchedule
+
+# For AWS EKS with managed node groups:
+# eksctl create nodegroup \
+#   --cluster=llm-cluster \
+#   --name=gpu-nodes \
+#   --node-type=g4dn.xlarge \
+#   --nodes=1 \
+#   --nodes-min=0 \
+#   --nodes-max=3 \
+#   --node-labels=workload=gpu,gpu-type=t4 \
+#   --node-taints=nvidia.com/gpu=present:NoSchedule
+
+---
+# Node pool configuration for AKS (Azure)
+# az aks nodepool add \
+#   --resource-group myResourceGroup \
+#   --cluster-name llm-cluster \
+#   --name gpupool \
+#   --node-count 1 \
+#   --node-vm-size Standard_NC6s_v3 \
+#   --node-taints nvidia.com/gpu=present:NoSchedule \
+#   --labels workload=gpu gpu-type=v100
+
+---
+# RuntimeClass for GPU containers (if needed)
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: nvidia
+handler: nvidia
+
+---
+# PriorityClass for GPU workloads
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: gpu-workload-priority
+value: 1000
+globalDefault: false
+description: "Priority class for GPU workloads"
+
+---
+# Example node affinity and tolerations for GPU pods
+# Add to pod spec in deployment.yaml:
+#
+# affinity:
+#   nodeAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#       nodeSelectorTerms:
+#         - matchExpressions:
+#             - key: workload
+#               operator: In
+#               values:
+#                 - gpu
+# tolerations:
+#   - key: nvidia.com/gpu
+#     operator: Exists
+#     effect: NoSchedule
+
+# GPU device plugin (usually pre-installed)
+# For manual installation:
+# kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.14.0/nvidia-device-plugin.yml

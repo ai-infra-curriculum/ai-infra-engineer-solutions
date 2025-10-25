@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: model-serving
+  labels:
+    name: model-serving
+    environment: production
+    project: basic-model-serving

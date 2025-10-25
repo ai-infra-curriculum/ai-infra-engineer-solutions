@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-api-config
+  namespace: llm-platform
+data:
+  MODEL_CONFIG: "tiny-llama"  # Change to llama2-7b-chat for production
+  EMBEDDING_MODEL: "all-MiniLM-L6-v2"
+  VECTOR_DB_BACKEND: "chromadb"
+  CHROMA_PERSIST_DIR: "/app/chroma_db"
+  RAG_TOP_K: "5"
+  RAG_CHUNK_SIZE: "512"
+  RAG_CHUNK_OVERLAP: "50"
+  GPU_COST_PER_HOUR: "1.0"
+  RATE_LIMIT_RPM: "60"
+  LOG_LEVEL: "INFO"
+  PORT: "8000"
+  HOST: "0.0.0.0"

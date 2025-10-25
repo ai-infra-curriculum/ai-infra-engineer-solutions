@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-serving
+  namespace: model-serving
+  labels:
+    app: model-serving
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: "/metrics"
+spec:
+  type: LoadBalancer
+  selector:
+    app: model-serving
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP
+  sessionAffinity: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-serving-nodeport
+  namespace: model-serving
+  labels:
+    app: model-serving
+spec:
+  type: NodePort
+  selector:
+    app: model-serving
+  ports:
+  - name: http
+    port: 8000
+    targetPort: http
+    nodePort: 30080
+    protocol: TCP

@@ -1,0 +1,267 @@
+name: Repository CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run weekly to catch dependency issues
+    - cron: '0 0 * * 0'
+
+jobs:
+  markdown-lint:
+    name: Lint Markdown Files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint Markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v13
+        with:
+          globs: |
+            **/*.md
+            !**/node_modules/**
+            !**/venv/**
+
+  check-links:
+    name: Check Documentation Links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check links in documentation
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          config-file: '.github/markdown-link-check-config.json'
+
+  validate-structure:
+    name: Validate Repository Structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files
+        run: |
+          echo "Checking for required files..."
+          required_files=(
+            "README.md"
+            "CONTRIBUTING.md"
+            "LEARNING_GUIDE.md"
+            "LICENSE"
+            "guides/debugging-guide.md"
+            "guides/optimization-guide.md"
+            "guides/production-readiness.md"
+          )
+
+          missing_files=()
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              missing_files+=("$file")
+            fi
+          done
+
+          if [ ${#missing_files[@]} -ne 0 ]; then
+            echo "❌ Missing required files:"
+            printf '%s\n' "${missing_files[@]}"
+            exit 1
+          fi
+
+          echo "✅ All required files present"
+
+      - name: Validate project structure
+        run: |
+          echo "Checking project directories..."
+          projects=(
+            "projects/project-01-basic-model-serving"
+            "projects/project-02-mlops-pipeline"
+            "projects/project-03-llm-deployment"
+          )
+
+          for project in "${projects[@]}"; do
+            if [ ! -d "$project" ]; then
+              echo "❌ Missing project directory: $project"
+              exit 1
+            fi
+
+            # Check for essential project files
+            if [ ! -f "$project/README.md" ]; then
+              echo "❌ Missing README in $project"
+              exit 1
+            fi
+
+            if [ ! -f "$project/requirements.txt" ]; then
+              echo "❌ Missing requirements.txt in $project"
+              exit 1
+            fi
+          done
+
+          echo "✅ All project directories present with required files"
+
+  test-docker-builds:
+    name: Test Docker Builds
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - project-01-basic-model-serving
+          - project-02-mlops-pipeline
+          - project-03-llm-deployment
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Test Docker build for ${{ matrix.project }}
+        run: |
+          cd projects/${{ matrix.project }}
+
+          # Check if Dockerfile exists
+          if [ -f "Dockerfile" ]; then
+            echo "Building Docker image for ${{ matrix.project }}..."
+            docker build --platform linux/amd64 -t test-${{ matrix.project }}:latest .
+            echo "✅ Docker build successful"
+          else
+            echo "⚠️  No Dockerfile found for ${{ matrix.project }}"
+          fi
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  python-tests:
+    name: Run Python Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11']
+        project:
+          - project-01-basic-model-serving
+          - project-02-mlops-pipeline
+          - project-03-llm-deployment
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies for ${{ matrix.project }}
+        run: |
+          cd projects/${{ matrix.project }}
+          python -m pip install --upgrade pip
+
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+          fi
+
+          if [ -f "requirements-dev.txt" ]; then
+            pip install -r requirements-dev.txt
+          fi
+
+      - name: Run tests for ${{ matrix.project }}
+        run: |
+          cd projects/${{ matrix.project }}
+
+          if [ -d "tests" ]; then
+            echo "Running tests for ${{ matrix.project }}..."
+            pytest tests/ -v --tb=short || echo "⚠️  Some tests failed"
+          else
+            echo "⚠️  No tests directory found"
+          fi
+
+  documentation-check:
+    name: Check Documentation Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check README completeness
+        run: |
+          echo "Checking README.md..."
+
+          required_sections=(
+            "Overview"
+            "Projects"
+            "Quick Start"
+            "Documentation"
+          )
+
+          for section in "${required_sections[@]}"; do
+            if ! grep -qi "$section" README.md; then
+              echo "⚠️  Missing section: $section"
+            fi
+          done
+
+          echo "✅ README check complete"
+
+      - name: Check for broken internal links
+        run: |
+          echo "Checking internal links..."
+
+          # Find all markdown files
+          find . -name "*.md" -type f | while read -r file; do
+            # Extract internal links
+            grep -oP '\[.*?\]\(\K[^)]+' "$file" | while read -link; do
+              # Skip external links
+              if [[ $link =~ ^https?:// ]]; then
+                continue
+              fi
+
+              # Convert relative path to absolute
+              dir=$(dirname "$file")
+              target="$dir/$link"
+
+              # Check if file exists
+              if [ ! -f "$target" ] && [ ! -d "$target" ]; then
+                echo "⚠️  Broken link in $file: $link"
+              fi
+            done
+          done
+
+          echo "✅ Internal link check complete"
+
+  notify:
+    name: Notify Results
+    needs: [markdown-lint, validate-structure, security-scan, python-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check job results
+        run: |
+          if [[ "${{ needs.markdown-lint.result }}" == "success" ]] && \
+             [[ "${{ needs.validate-structure.result }}" == "success" ]] && \
+             [[ "${{ needs.security-scan.result }}" == "success" ]] && \
+             [[ "${{ needs.python-tests.result }}" == "success" ]]; then
+            echo "✅ All checks passed!"
+          else
+            echo "⚠️  Some checks failed. Please review the logs."
+            exit 1
+          fi

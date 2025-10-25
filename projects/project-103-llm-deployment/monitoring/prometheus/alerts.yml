@@ -1,0 +1,190 @@
+# Prometheus alerts for LLM platform
+
+groups:
+  - name: llm_api_alerts
+    interval: 30s
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(llm_requests_total{status="error"}[5m])) by (model, endpoint)
+          /
+          sum(rate(llm_requests_total[5m])) by (model, endpoint)
+          > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for {{ $labels.endpoint }}"
+
+      # High latency
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(llm_request_duration_seconds_bucket[5m])) by (model, endpoint, le)
+          ) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request latency detected"
+          description: "P95 latency is {{ $value }}s for {{ $labels.endpoint }}"
+
+      # Low throughput
+      - alert: LowTokenThroughput
+        expr: llm_tokens_per_second{model=~".*"} < 10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low token generation throughput"
+          description: "Throughput is only {{ $value }} tokens/sec for {{ $labels.model }}"
+
+      # API down
+      - alert: APIDown
+        expr: up{job="llm-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "LLM API is down"
+          description: "API instance {{ $labels.instance }} is down"
+
+      # High request queue
+      - alert: HighRequestQueue
+        expr: llm_requests_in_progress{model=~".*"} > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request queue detected"
+          description: "{{ $value }} requests in progress for {{ $labels.endpoint }}"
+
+  - name: gpu_alerts
+    interval: 30s
+    rules:
+      # GPU utilization too low
+      - alert: LowGPUUtilization
+        expr: llm_gpu_utilization_percent < 30
+        for: 15m
+        labels:
+          severity: info
+        annotations:
+          summary: "Low GPU utilization"
+          description: "GPU {{ $labels.gpu_id }} utilization is only {{ $value }}%"
+
+      # GPU memory almost full
+      - alert: GPUMemoryHigh
+        expr: |
+          (llm_gpu_memory_used_bytes / llm_gpu_memory_total_bytes) > 0.90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "GPU memory usage high"
+          description: "GPU {{ $labels.gpu_id }} memory usage is {{ $value | humanizePercentage }}"
+
+      # GPU temperature high
+      - alert: GPUTemperatureHigh
+        expr: llm_gpu_temperature_celsius > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "GPU temperature high"
+          description: "GPU {{ $labels.gpu_id }} temperature is {{ $value }}°C"
+
+      # GPU not detected
+      - alert: GPUNotDetected
+        expr: absent(llm_gpu_utilization_percent)
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "GPU not detected"
+          description: "No GPU metrics available"
+
+  - name: cost_alerts
+    interval: 5m
+    rules:
+      # High estimated monthly cost
+      - alert: HighMonthlyCost
+        expr: llm_estimated_cost_usd_total > 1000
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Estimated monthly cost is high"
+          description: "Estimated monthly cost is ${{ $value }}"
+
+      # Cost per request increasing
+      - alert: IncreasingCostPerRequest
+        expr: |
+          deriv(llm_estimated_cost_usd_total[1h]) > 0.1
+        for: 30m
+        labels:
+          severity: info
+        annotations:
+          summary: "Cost per request is increasing"
+          description: "Cost trend is increasing"
+
+  - name: system_alerts
+    interval: 30s
+    rules:
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: llm_cpu_percent > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%"
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: llm_memory_used_bytes > 28 * 1024 * 1024 * 1024  # 28GB
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | humanize1024 }}"
+
+      # Disk space low
+      - alert: LowDiskSpace
+        expr: |
+          (node_filesystem_avail_bytes{mountpoint="/app"} / node_filesystem_size_bytes{mountpoint="/app"}) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining"
+
+  - name: rag_alerts
+    interval: 1m
+    rules:
+      # Vector DB unavailable
+      - alert: VectorDBDown
+        expr: up{job="chromadb"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Vector database is down"
+          description: "ChromaDB instance is unavailable"
+
+      # Slow retrievals
+      - alert: SlowRAGRetrieval
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(llm_rag_retrieval_duration_seconds_bucket[5m])) by (model, le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "RAG retrieval is slow"
+          description: "P95 retrieval time is {{ $value }}s"

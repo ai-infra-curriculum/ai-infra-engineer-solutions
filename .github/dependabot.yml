@@ -1,0 +1,100 @@
+version: 2
+updates:
+  # Enable version updates for pip
+  - package-ecosystem: "pip"
+    directory: "/projects/project-01-basic-model-serving"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "project-01"
+    reviewers:
+      - "ai-infra-curriculum"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  - package-ecosystem: "pip"
+    directory: "/projects/project-02-mlops-pipeline"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "project-02"
+    reviewers:
+      - "ai-infra-curriculum"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  - package-ecosystem: "pip"
+    directory: "/projects/project-03-llm-deployment"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "project-03"
+    reviewers:
+      - "ai-infra-curriculum"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    directory: "/projects/project-01-basic-model-serving"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "docker"
+    reviewers:
+      - "ai-infra-curriculum"
+
+  - package-ecosystem: "docker"
+    directory: "/projects/project-02-mlops-pipeline"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "docker"
+    reviewers:
+      - "ai-infra-curriculum"
+
+  - package-ecosystem: "docker"
+    directory: "/projects/project-03-llm-deployment"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "docker"
+    reviewers:
+      - "ai-infra-curriculum"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    reviewers:
+      - "ai-infra-curriculum"
+    commit-message:
+      prefix: "ci"
+      include: "scope"

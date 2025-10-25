@@ -1,0 +1,89 @@
+groups:
+  - name: model_serving_alerts
+    interval: 30s
+    rules:
+      # Alert when service is down
+      - alert: ModelServingDown
+        expr: up{job="model-serving-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: model-serving
+        annotations:
+          summary: "Model serving API is down"
+          description: "The model serving API has been down for more than 1 minute."
+
+      # Alert when API latency is high
+      - alert: HighAPILatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="model-serving-api"}[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          service: model-serving
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile API latency is above 500ms for more than 5 minutes."
+
+      # Alert when error rate is high
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{job="model-serving-api", status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{job="model-serving-api"}[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          service: model-serving
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 5% for more than 5 minutes."
+
+      # Alert when CPU usage is high
+      - alert: HighCPUUsage
+        expr: |
+          container_cpu_usage_seconds_total{pod=~"model-serving-.*"}
+          / container_spec_cpu_quota{pod=~"model-serving-.*"} * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          service: model-serving
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 10 minutes."
+
+      # Alert when memory usage is high
+      - alert: HighMemoryUsage
+        expr: |
+          container_memory_usage_bytes{pod=~"model-serving-.*"}
+          / container_spec_memory_limit_bytes{pod=~"model-serving-.*"} * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          service: model-serving
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for more than 10 minutes."
+
+      # Alert when pod is restarting frequently
+      - alert: PodRestartingFrequently
+        expr: rate(kube_pod_container_status_restarts_total{pod=~"model-serving-.*"}[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          service: model-serving
+        annotations:
+          summary: "Pod restarting frequently"
+          description: "Pod {{ $labels.pod }} is restarting frequently."
+
+      # Alert when deployment has insufficient replicas
+      - alert: InsufficientReplicas
+        expr: kube_deployment_status_replicas_available{deployment="model-serving"} < 2
+        for: 5m
+        labels:
+          severity: warning
+          service: model-serving
+        annotations:
+          summary: "Insufficient replicas available"
+          description: "Model serving deployment has less than 2 replicas available."

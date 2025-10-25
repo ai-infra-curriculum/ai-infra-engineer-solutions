@@ -1,0 +1,42 @@
+---
+# ClusterIP Service (internal)
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-api
+  namespace: llm-platform
+  labels:
+    app: llm-api
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
+  selector:
+    app: llm-api
+
+---
+# LoadBalancer Service (external)
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-api-external
+  namespace: llm-platform
+  labels:
+    app: llm-api
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  selector:
+    app: llm-api
+  sessionAffinity: ClientIP  # Stick to same pod for streaming

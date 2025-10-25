@@ -1,0 +1,157 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-api
+  namespace: llm-platform
+  labels:
+    app: llm-api
+    component: api
+spec:
+  replicas: 1  # Single replica due to GPU constraint, scale horizontally with more GPUs
+  selector:
+    matchLabels:
+      app: llm-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: llm-api
+        component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      # GPU node selector and tolerations
+      nodeSelector:
+        cloud.google.com/gke-accelerator: nvidia-tesla-t4  # Adjust based on GPU type
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+
+      containers:
+        - name: llm-api
+          image: llm-deployment-platform:latest  # Replace with your image
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+
+          env:
+            - name: MODEL_CONFIG
+              valueFrom:
+                configMapKeyRef:
+                  name: llm-api-config
+                  key: MODEL_CONFIG
+            - name: EMBEDDING_MODEL
+              valueFrom:
+                configMapKeyRef:
+                  name: llm-api-config
+                  key: EMBEDDING_MODEL
+            - name: VECTOR_DB_BACKEND
+              valueFrom:
+                configMapKeyRef:
+                  name: llm-api-config
+                  key: VECTOR_DB_BACKEND
+            - name: CHROMA_PERSIST_DIR
+              valueFrom:
+                configMapKeyRef:
+                  name: llm-api-config
+                  key: CHROMA_PERSIST_DIR
+            - name: RAG_TOP_K
+              valueFrom:
+                configMapKeyRef:
+                  name: llm-api-config
+                  key: RAG_TOP_K
+            - name: RAG_CHUNK_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: llm-api-config
+                  key: RAG_CHUNK_SIZE
+            - name: GPU_COST_PER_HOUR
+              valueFrom:
+                configMapKeyRef:
+                  name: llm-api-config
+                  key: GPU_COST_PER_HOUR
+            - name: RATE_LIMIT_RPM
+              valueFrom:
+                configMapKeyRef:
+                  name: llm-api-config
+                  key: RATE_LIMIT_RPM
+            - name: HUGGING_FACE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: llm-api-secrets
+                  key: HUGGING_FACE_TOKEN
+                  optional: true
+
+          resources:
+            requests:
+              memory: "16Gi"
+              cpu: "4"
+              nvidia.com/gpu: "1"
+            limits:
+              memory: "32Gi"
+              cpu: "8"
+              nvidia.com/gpu: "1"
+
+          volumeMounts:
+            - name: chromadb-data
+              mountPath: /app/chroma_db
+            - name: model-storage
+              mountPath: /app/models
+            - name: logs
+              mountPath: /app/logs
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30  # Allow up to 5 minutes for startup
+
+      volumes:
+        - name: chromadb-data
+          persistentVolumeClaim:
+            claimName: chromadb-data
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: model-storage
+        - name: logs
+          persistentVolumeClaim:
+            claimName: llm-logs
+
+      # Security context
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsNonRoot: true
+
+      # Graceful shutdown
+      terminationGracePeriodSeconds: 60

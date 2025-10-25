@@ -1,0 +1,22 @@
+# Core dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# ML/AI dependencies
+torch==2.1.1
+torchvision==0.16.1
+pillow==10.1.0
+numpy==1.26.2
+
+# Monitoring and metrics
+prometheus-fastapi-instrumentator==6.1.0
+prometheus-client==0.19.0
+
+# HTTP client
+requests==2.31.0
+
+# Logging and utilities
+python-dotenv==1.0.0

@@ -1,0 +1,91 @@
+groups:
+  - name: mlops_alerts
+    interval: 30s
+    rules:
+      # Pipeline failure alerts
+      - alert: PipelineFailure
+        expr: rate(pipeline_runs_total{status="failed"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MLOps pipeline failure detected"
+          description: "Pipeline {{ $labels.pipeline_name }} has failed"
+
+      # Data quality alerts
+      - alert: LowDataQuality
+        expr: data_quality_score < 0.7
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low data quality detected"
+          description: "Data quality score is {{ $value }}"
+
+      # Model performance alerts
+      - alert: ModelAccuracyDrop
+        expr: rate(model_accuracy[1h]) < 0.7
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Model accuracy has dropped"
+          description: "Model {{ $labels.model_name }} accuracy: {{ $value }}"
+
+      # Drift detection alerts
+      - alert: DataDriftDetected
+        expr: feature_drift_score > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Data drift detected"
+          description: "Feature {{ $labels.feature_name }} drift score: {{ $value }}"
+
+      - alert: PredictionDriftDetected
+        expr: prediction_drift_score > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prediction drift detected"
+          description: "Prediction drift score: {{ $value }}"
+
+      # Deployment alerts
+      - alert: DeploymentFailure
+        expr: rate(model_deployments_total{status="failed"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Model deployment failure"
+          description: "Deployment of {{ $labels.model_name }} has failed"
+
+      # Resource usage alerts
+      - alert: HighMemoryUsage
+        expr: container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Container {{ $labels.container_name }} memory usage: {{ $value }}"
+
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total[5m]) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "Container {{ $labels.container_name }} CPU usage: {{ $value }}"
+
+      # Service availability alerts
+      - alert: ServiceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.job }} is down"

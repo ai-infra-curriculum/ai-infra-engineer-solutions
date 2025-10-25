@@ -1,0 +1,17 @@
+black>=23.7.0
+chromadb>=0.4.13
+fastapi>=0.103.0
+flake8>=6.1.0
+httpx>=0.25.0
+langchain>=0.0.310
+mypy>=1.5.0
+pydantic>=2.0.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest>=7.4.0
+python-dotenv>=1.0.0
+redis>=5.0.0
+requests>=2.31.0
+sentence-transformers>=2.2.2
+transformers>=4.33.0
+uvicorn>=0.23.2

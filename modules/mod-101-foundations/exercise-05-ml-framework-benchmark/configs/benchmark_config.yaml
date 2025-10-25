@@ -1,0 +1,26 @@
+# Default benchmark configuration
+
+frameworks:
+  - pytorch
+  - tensorflow
+  - jax
+
+models:
+  - cnn
+  - mlp
+
+devices:
+  - cpu
+  - cuda:0
+
+batch_sizes:
+  - 32
+  - 64
+
+num_epochs: 5
+dataset: cifar10
+
+precision:
+  - fp32
+
+output_dir: results/benchmark

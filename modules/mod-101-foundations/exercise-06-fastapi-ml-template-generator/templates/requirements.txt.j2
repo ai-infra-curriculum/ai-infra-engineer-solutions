@@ -1,0 +1,25 @@
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+pydantic>=2.0.0
+python-multipart>=0.0.6
+numpy>=1.24.0
+{% if template_type == "image_classification" or template_type == "object_detection" %}
+pillow>=10.0.0
+torch>=2.0.0
+torchvision>=0.15.0
+{% endif %}
+{% if template_type == "text_classification" %}
+transformers>=4.30.0
+torch>=2.0.0
+{% endif %}
+{% if with_monitoring %}
+prometheus-fastapi-instrumentator>=6.1.0
+{% endif %}
+{% if with_rate_limiting %}
+slowapi>=0.1.9
+{% endif %}
+{% if with_auth %}
+pyjwt>=2.8.0
+passlib[bcrypt]>=1.7.4
+python-jose[cryptography]>=3.3.0
+{% endif %}

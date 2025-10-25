@@ -1,0 +1,21 @@
+# Quick test configuration - fast benchmark for development/testing
+
+frameworks:
+  - pytorch
+
+models:
+  - mlp
+
+devices:
+  - cpu
+
+batch_sizes:
+  - 32
+
+num_epochs: 1
+dataset: mnist
+
+precision:
+  - fp32
+
+output_dir: results/quick_test

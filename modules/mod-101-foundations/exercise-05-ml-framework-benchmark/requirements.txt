@@ -1,0 +1,14 @@
+torch>=2.0.0
+torchvision>=0.15.0
+tensorflow>=2.13.0
+jax[cpu]>=0.4.0
+flax>=0.7.0
+optax>=0.1.7
+numpy>=1.24.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+pandas>=2.0.0
+pyyaml>=6.0
+rich>=13.0.0
+click>=8.1.0
+psutil>=5.9.0

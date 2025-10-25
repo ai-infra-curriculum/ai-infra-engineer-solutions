@@ -1,0 +1,78 @@
+# {{ project_name }}
+
+{{ project_description }}
+
+Auto-generated FastAPI ML service by mlapi-gen.
+
+## Features
+
+- FastAPI application with async support
+- Pydantic validation for request/response
+- Auto-generated OpenAPI documentation
+- Comprehensive test suite
+- Docker containerization
+- CI/CD with GitHub Actions
+{% if with_monitoring %}
+- Prometheus metrics + Grafana dashboards
+{% endif %}
+{% if with_rate_limiting %}
+- Rate limiting
+{% endif %}
+{% if with_auth %}
+- JWT authentication
+{% endif %}
+
+## Quick Start
+
+### Local Development
+
+1. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Place your model**:
+   ```bash
+   cp your_model.pt models/model.pt
+   ```
+
+3. **Run the API**:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+4. **Open API docs**: http://localhost:8000/docs
+
+### Docker
+
+```bash
+# Build and run
+docker-compose up
+```
+
+## API Endpoints
+
+### POST /api/v1/predict
+
+Make a prediction.
+
+**cURL Example**:
+```bash
+curl -X POST http://localhost:8000/api/v1/predict \
+  -H "Content-Type: application/json" \
+  -d '{"input": "sample data"}'
+```
+
+## Testing
+
+```bash
+# Run all tests
+pytest tests/ -v
+
+# With coverage
+pytest tests/ --cov=app --cov-report=html
+```
+
+## License
+
+MIT

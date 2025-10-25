@@ -22,6 +22,25 @@ This repository contains **complete, production-ready implementations** of all p
 - 🔧 **Setup scripts** - One-command deployment and testing
 - 📖 **Troubleshooting guides** - Common issues and solutions
 
+## ✨ What's New
+
+**Recently Added Content:**
+- 📝 **Comprehensive Quizzes** - 265+ quiz questions added across modules 102-110 in the learning repository
+  - Module 102: Cloud Computing (50 questions: mid-module + final)
+  - Module 103: Containerization (25 questions)
+  - Module 104: Kubernetes (30 questions)
+  - Module 105: Data Pipelines (25 questions)
+  - Module 106: MLOps (25 questions)
+  - Module 107: GPU Computing (25 questions)
+  - Module 108: Monitoring (25 questions)
+  - Module 109: Infrastructure as Code (25 questions)
+  - Module 110: LLM Infrastructure (30 questions)
+
+**New Documentation:**
+- 📋 **[Technology Versions Guide](https://github.com/ai-infra-curriculum/ai-infra-engineer-learning/blob/main/VERSIONS.md)** - Comprehensive version specifications for 100+ tools
+- 🗺️ **[Curriculum Cross-Reference](https://github.com/ai-infra-curriculum/.github/blob/main/CURRICULUM_CROSS_REFERENCE.md)** - Complete mapping between Junior and Engineer tracks
+- 📈 **[Career Progression Guide](https://github.com/ai-infra-curriculum/.github/blob/main/CAREER_PROGRESSION.md)** - Detailed career ladder from L3 to L8
+
 ## 📁 Repository Structure
 
 ```

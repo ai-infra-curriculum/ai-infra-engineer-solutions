@@ -45,19 +45,65 @@ This repository contains **complete, production-ready implementations** of all p
 
 ```
 ai-infra-engineer-solutions/
-├── projects/
-│   ├── project-101-basic-model-serving/     # FastAPI + Kubernetes + Monitoring
-│   ├── project-102-mlops-pipeline/          # Airflow + MLflow + DVC
-│   └── project-103-llm-deployment/          # vLLM + RAG + Vector DB
+├── modules/                                  # Module-specific exercise solutions
+│   ├── mod-101-foundations/                 # 3 advanced exercises (88-108 hrs)
+│   │   ├── exercise-04-python-env-manager/
+│   │   ├── exercise-05-ml-framework-benchmark/
+│   │   └── exercise-06-fastapi-ml-template-generator/
+│   ├── mod-102-cloud-computing/             # 3 exercises
+│   ├── mod-103-containerization/            # 3 exercises
+│   ├── mod-104-kubernetes/                  # 3 exercises (105-135 hrs)
+│   │   ├── exercise-04-k8s-cluster-autoscaler/
+│   │   ├── exercise-05-service-mesh-observability/
+│   │   └── exercise-06-k8s-operator-framework/
+│   ├── mod-105-data-pipelines/              # 2 exercises (71-89 hrs)
+│   │   ├── exercise-03-streaming-pipeline-kafka/
+│   │   └── exercise-04-workflow-orchestration-airflow/
+│   ├── mod-106-mlops/                       # 3 exercises (90-118 hrs)
+│   │   ├── exercise-04-experiment-tracking-mlflow/
+│   │   ├── exercise-05-model-monitoring-drift/
+│   │   └── exercise-06-ci-cd-ml-pipelines/
+│   ├── mod-107-gpu-computing/               # 3 exercises (105-135 hrs)
+│   │   ├── exercise-04-gpu-cluster-management/
+│   │   ├── exercise-05-gpu-performance-optimization/
+│   │   └── exercise-06-distributed-gpu-training/
+│   ├── mod-108-monitoring-observability/    # 2 exercises (56-72 hrs)
+│   │   ├── exercise-01-observability-stack/
+│   │   └── exercise-02-ml-model-monitoring/
+│   ├── mod-109-infrastructure-as-code/      # 2 exercises (64-80 hrs)
+│   │   ├── exercise-01-terraform-ml-infrastructure/
+│   │   └── exercise-02-pulumi-multicloud-ml/
+│   └── mod-110-llm-infrastructure/          # 2 exercises (72-88 hrs)
+│       ├── exercise-01-production-llm-serving/
+│       └── exercise-02-production-rag-system/
+├── projects/                                # Capstone integration projects
+│   ├── project-101-basic-model-serving/    # FastAPI + Kubernetes + Monitoring
+│   ├── project-102-mlops-pipeline/         # Airflow + MLflow + DVC
+│   └── project-103-llm-deployment/         # vLLM + RAG + Vector DB
 ├── guides/
-│   ├── debugging-guide.md                   # Common debugging strategies
-│   ├── optimization-guide.md                # Performance optimization tips
-│   └── production-readiness.md              # Production deployment checklist
+│   ├── debugging-guide.md                  # Common debugging strategies
+│   ├── optimization-guide.md               # Performance optimization tips
+│   └── production-readiness.md             # Production deployment checklist
 ├── resources/
-│   └── additional-materials.md              # Extra learning resources
+│   └── additional-materials.md             # Extra learning resources
 └── .github/
-    └── workflows/                           # CI/CD pipelines
+    └── workflows/                          # CI/CD pipelines
 ```
+
+### Module Exercise Solutions (26 exercises, 563-717 hours total)
+
+Each module contains **production-grade implementations** of advanced exercises from the learning repository:
+
+- **Complete source code** with proper project structure
+- **Kubernetes manifests** for production deployment
+- **Docker configurations** with multi-stage builds
+- **Comprehensive test suites** (unit, integration, e2e)
+- **Monitoring setup** (Prometheus metrics, Grafana dashboards)
+- **CI/CD pipelines** for automated testing and deployment
+- **Detailed documentation** including architecture diagrams
+- **Setup scripts** for one-command deployment
+
+See individual module directories for specific exercise solutions.
 
 ## 🚀 Quick Start
 
@@ -165,6 +211,84 @@ Build an enterprise LLM deployment platform with:
 - Monitor costs and performance
 
 [→ View Project 03](./projects/project-103-llm-deployment/)
+
+---
+
+## 🎓 Module Exercise Solutions
+
+In addition to the three capstone projects above, this repository contains **26 production-ready solutions** for advanced module exercises from the learning repository.
+
+### How Module Exercises Work
+
+**Module exercises** are focused, production-grade implementations that teach specific skills:
+- Each exercise typically takes **28-45 hours** to complete
+- Exercises build advanced expertise in specific technology areas
+- Solutions demonstrate production patterns and best practices
+- Great for portfolio building and skill demonstration
+
+**Projects** are integrative capstone projects that combine multiple concepts:
+- Projects take **8-40 hours** depending on complexity
+- They integrate concepts from multiple modules
+- Ideal for demonstrating end-to-end system design
+
+### Module Exercise Coverage
+
+| Module | Exercises | Total Time | Key Technologies |
+|--------|-----------|------------|------------------|
+| **101: Foundations** | 3 exercises | 88-108 hrs | Python tooling, ML benchmarking, FastAPI templates |
+| **102: Cloud Computing** | 3 exercises | - | Multi-cloud, cost optimization, disaster recovery |
+| **103: Containerization** | 3 exercises | - | Container security, image optimization, registries |
+| **104: Kubernetes** | 3 exercises | 105-135 hrs | Cluster autoscaling, service mesh, operators |
+| **105: Data Pipelines** | 2 exercises | 71-89 hrs | Kafka streaming, Airflow orchestration |
+| **106: MLOps** | 3 exercises | 90-118 hrs | MLflow, model monitoring, CI/CD pipelines |
+| **107: GPU Computing** | 3 exercises | 105-135 hrs | GPU clusters, performance optimization, distributed training |
+| **108: Monitoring** | 2 exercises | 56-72 hrs | Observability stack, model monitoring |
+| **109: Infrastructure as Code** | 2 exercises | 64-80 hrs | Terraform, Pulumi multi-cloud |
+| **110: LLM Infrastructure** | 2 exercises | 72-88 hrs | vLLM serving, RAG systems |
+
+**Total**: 26 exercises, 563-717 hours of advanced content
+
+### Using Module Exercise Solutions
+
+1. **Navigate to the module directory:**
+   ```bash
+   cd modules/mod-107-gpu-computing/exercise-04-gpu-cluster-management/
+   ```
+
+2. **Read the exercise README:**
+   ```bash
+   cat README.md
+   ```
+
+3. **Review the solution architecture:**
+   ```bash
+   cat docs/ARCHITECTURE.md
+   ```
+
+4. **Run the solution locally:**
+   ```bash
+   ./scripts/setup.sh
+   docker-compose up
+   ```
+
+5. **Deploy to Kubernetes:**
+   ```bash
+   kubectl apply -f kubernetes/
+   ```
+
+6. **Run tests:**
+   ```bash
+   pytest tests/
+   ```
+
+Each exercise solution includes:
+- Complete implementation with no stubs
+- Step-by-step setup instructions
+- Architecture documentation and diagrams
+- Kubernetes deployment manifests
+- Comprehensive test suites
+- Monitoring and observability setup
+- Troubleshooting guides
 
 ## 📖 How to Use This Repository
 

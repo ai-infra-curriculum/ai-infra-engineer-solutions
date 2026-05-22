@@ -312,14 +312,15 @@ ai-infra-engineer-solutions/
 │   ├── mod-108-monitoring/           # Observability
 │   ├── mod-109-iac/                  # Terraform, Pulumi
 │   └── mod-110-llm-infrastructure/   # LLM deployment
-├── docs/
-│   ├── COMPLETION_REPORT.md          # This guide
-│   ├── QUICK_START_GUIDE.md          # You are here
-│   ├── CURRICULUM_INDEX.md           # Full catalog
-│   └── PROGRESS_TRACKER.md           # Track your progress
+├── guides/                           # Solution walkthroughs and references
+├── resources/                        # Supplemental materials
+├── CURRICULUM_INDEX.md               # Full catalog
+├── QUICK_START_GUIDE.md              # You are here
 ├── README.md                         # Repository overview
 └── LEARNING_GUIDE.md                 # How to learn effectively
 ```
+
+Internal validation and completion reports are archived in the workspace `_meta/housekeeping/ai-infra-engineer-solutions/` rather than kept in this repo root.
 
 ### Typical Exercise Workflow
 

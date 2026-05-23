@@ -1,0 +1,25 @@
+id: classify_intent
+version: 2
+description: "Classify user intent — v2 with explicit examples"
+model: "mistral-7b"
+temperature: 0
+schema:
+  type: object
+  properties:
+    intent: { type: string, enum: ["question", "command", "feedback", "spam", "other"] }
+template: |
+  Classify the user message into ONE intent from this list:
+  - question   ("how do I…", "what is…")
+  - command    ("add X", "delete Y")
+  - feedback   ("this is great", "fix this bug")
+  - spam       ("buy our product")
+  - other      (anything else)
+
+  Examples:
+  - "What's the weather?" → question
+  - "Delete my account" → command
+  - "I love this app" → feedback
+
+  Message: {message}
+
+  Return JSON: {"intent": "..."}

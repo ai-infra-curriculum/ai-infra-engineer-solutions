@@ -1,0 +1,12 @@
+# API key hashes: SHA-256 of the actual key. Never commit plaintext.
+tenants:
+  - id: acme
+    api_key_hash: "c0fb1f2d...REPLACE..."
+    rpm_limit: 600
+    monthly_token_budget: 100_000_000
+    allowed_models: ["mistral-7b", "llama-13b"]
+  - id: globex
+    api_key_hash: "8e2bcd91...REPLACE..."
+    rpm_limit: 120
+    monthly_token_budget: 20_000_000
+    allowed_models: ["mistral-7b"]

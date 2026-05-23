@@ -1,0 +1,5 @@
+{"id":1,"input":"capital of France","expected":"Paris","actual":"Paris","rubric":"factual"}
+{"id":2,"input":"capital of Japan","expected":"Tokyo","actual":"Tokyo","rubric":"factual"}
+{"id":3,"input":"1+1","expected":"2","actual":"2","rubric":"arithmetic"}
+{"id":4,"input":"summarize: long blah blah","expected":"key point","actual":"key point","rubric":"summary"}
+{"id":5,"input":"translate hi to french","expected":"salut","actual":"bonjour","rubric":"translation"}

@@ -1,0 +1,19 @@
+tiers:
+  small:
+    model: "mistral-7b-local"
+    endpoint: "http://vllm:8000/v1/completions"
+    cost_per_1k_input: 0.0001    # local; only GPU amortization
+    cost_per_1k_output: 0.0001
+  medium:
+    model: "gpt-4o-mini"
+    endpoint: "https://api.openai.com/v1/chat/completions"
+    cost_per_1k_input: 0.00015
+    cost_per_1k_output: 0.0006
+  large:
+    model: "gpt-4o"
+    endpoint: "https://api.openai.com/v1/chat/completions"
+    cost_per_1k_input: 0.0025
+    cost_per_1k_output: 0.01
+
+confidence_threshold: 0.7
+escalation_max_depth: 2     # small → medium → large at most

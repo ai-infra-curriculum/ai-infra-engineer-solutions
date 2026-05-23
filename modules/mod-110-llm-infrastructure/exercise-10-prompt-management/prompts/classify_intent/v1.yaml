@@ -1,0 +1,17 @@
+id: classify_intent
+version: 1
+description: "Classify user intent into a fixed set"
+model: "mistral-7b"
+temperature: 0
+schema:
+  type: object
+  properties:
+    intent: { type: string, enum: ["question", "command", "feedback", "spam", "other"] }
+template: |
+  Classify the user message into one intent.
+
+  Allowed intents: question, command, feedback, spam, other.
+
+  Message: {message}
+
+  Return JSON: {"intent": "..."}

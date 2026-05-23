@@ -1,0 +1,17 @@
+# Copy to .github/workflows/prompt-pr.yml in your repo.
+# Runs the scoring harness against the PR-modified prompt; blocks on regression.
+name: prompt-validation
+on:
+  pull_request:
+    paths: ["prompts/**"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: python -c "import loader; loader.load('classify_intent')"   # smoke test
+      - run: python scoring/run.py --prompt classify_intent --against golden_set.jsonl --gate 0.85

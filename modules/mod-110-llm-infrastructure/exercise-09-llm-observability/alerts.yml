@@ -1,0 +1,22 @@
+groups:
+  - name: llm-platform
+    rules:
+      - alert: TTFTDegraded
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le, model) (rate(llm_time_to_first_token_seconds_bucket[5m]))) > 2
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "p95 TTFT > 2s for 10m on {{ $labels.model }}" }
+
+      - alert: RunawayPrompt
+        expr: histogram_quantile(0.99, sum by (le) (rate(llm_prompt_tokens_bucket[5m]))) > 50000
+        for: 5m
+        labels: { severity: warning }
+        annotations: { summary: "p99 prompt > 50K tokens — possible runaway client" }
+
+      - alert: ZeroThroughput
+        expr: rate(llm_tokens_per_second_count[5m]) == 0 and llm_active_streams > 0
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: "vLLM not producing tokens while streams active — hung worker?" }

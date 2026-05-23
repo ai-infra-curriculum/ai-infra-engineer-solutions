@@ -1,0 +1,7 @@
+boto3>=1.34
+sagemaker>=2.220
+google-cloud-aiplatform>=1.60
+azure-ai-ml>=1.16
+azure-identity>=1.16
+joblib>=1.3
+scikit-learn>=1.4

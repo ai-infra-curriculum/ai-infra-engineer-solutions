@@ -1,0 +1,6 @@
+# Monthly USD budget per team
+ml-platform: 50000
+recs: 30000
+fraud-detection: 15000
+data-science-research: 10000
+untagged: 1000     # if this is > 1000, you have a tagging hygiene problem

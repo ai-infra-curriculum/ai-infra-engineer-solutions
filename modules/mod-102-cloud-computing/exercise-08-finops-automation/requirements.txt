@@ -1,0 +1,6 @@
+boto3>=1.34
+click>=8.1
+pandas>=2.1
+pyarrow>=14
+pyyaml>=6.0
+requests>=2.31

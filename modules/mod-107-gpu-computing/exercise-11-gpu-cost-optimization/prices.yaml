@@ -1,0 +1,37 @@
+# GPU price table (USD/hour) — sample as of 2026-Q1
+H100:
+  on_demand: 4.10
+  spot: 1.60
+  reserved_3y: 2.20
+  tflops_fp16: 1979
+  vram_gb: 80
+A100_80:
+  on_demand: 2.90
+  spot: 1.10
+  reserved_3y: 1.45
+  tflops_fp16: 624
+  vram_gb: 80
+A100_40:
+  on_demand: 2.10
+  spot: 0.80
+  reserved_3y: 1.05
+  tflops_fp16: 312
+  vram_gb: 40
+L40S:
+  on_demand: 1.50
+  spot: 0.60
+  reserved_3y: 0.85
+  tflops_fp16: 363
+  vram_gb: 48
+L4:
+  on_demand: 0.90
+  spot: 0.35
+  reserved_3y: 0.50
+  tflops_fp16: 121
+  vram_gb: 24
+T4:
+  on_demand: 0.35
+  spot: 0.15
+  reserved_3y: 0.22
+  tflops_fp16: 65
+  vram_gb: 16

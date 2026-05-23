@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nvidia-device-plugin-config
+  namespace: kube-system
+data:
+  config.yaml: |
+    version: v1
+    flags:
+      migStrategy: mixed       # expose 1g.5gb, 2g.10gb, etc. as distinct resources
+      failOnInitError: true
+      nvidiaDriverRoot: /
+---
+# Device plugin DaemonSet wired to the configmap (excerpt — full ds at
+#   https://github.com/NVIDIA/k8s-device-plugin)

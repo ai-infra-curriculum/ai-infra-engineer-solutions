@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata: { name: mps-inference }
+spec:
+  restartPolicy: Never
+  containers:
+    - name: inference
+      image: pytorch/pytorch:2.3.0-cuda12.1-cudnn8-runtime
+      command: ["python", "-c", "import torch; print(torch.cuda.is_available())"]
+      resources:
+        limits: { nvidia.com/gpu: 1 }   # one of the 4 MPS slices

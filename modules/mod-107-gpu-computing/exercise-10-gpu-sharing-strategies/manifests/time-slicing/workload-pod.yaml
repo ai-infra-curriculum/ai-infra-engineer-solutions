@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata: { name: time-sliced }
+spec:
+  restartPolicy: Never
+  containers:
+    - name: dev
+      image: nvidia/cuda:12.4.1-base-ubuntu22.04
+      command: ["nvidia-smi"]
+      resources:
+        limits: { nvidia.com/gpu: 1 }  # one of N time slices

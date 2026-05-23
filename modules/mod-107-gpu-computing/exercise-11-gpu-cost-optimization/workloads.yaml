@@ -1,0 +1,35 @@
+- name: w1-realtime-inference
+  hours_per_day: 24
+  avg_instances: 4.5
+  gpu: L40S
+  purchase: reserved_3y
+  notes: "low-latency serving, steady demand"
+
+- name: w2-batch-overnight
+  hours_per_day: 4
+  avg_instances: 4
+  gpu: A100_80
+  purchase: spot
+  notes: "checkpoint-resilient batch"
+
+- name: w3-llm-247
+  hours_per_day: 24
+  avg_instances: 2
+  gpu: L40S
+  purchase: reserved_3y
+  notes: "Mistral-7B fp16, ~14GB"
+
+- name: w4-training-weekdays
+  hours_per_day: 8
+  days_per_week: 5
+  avg_instances: 4
+  gpu: A100_80
+  purchase: on_demand
+  notes: "multi-GPU training; NVLink needed; spot too risky"
+
+- name: w5-experimentation
+  hours_per_week: 12
+  avg_instances: 1
+  gpu: L40S
+  purchase: on_demand
+  notes: "MIG-shared in dev cluster"

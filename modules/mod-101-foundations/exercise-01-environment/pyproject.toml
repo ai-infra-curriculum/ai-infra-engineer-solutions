@@ -1,0 +1,19 @@
+[project]
+name = "labenv"
+version = "0.0.1"
+description = "Reference dev environment for mod-101 exercise-01"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4"]
+
+[tool.mypy]
+strict = true
+
+[tool.pytest.ini_options]
+addopts = "-ra -q"
+pythonpath = ["src"]
+testpaths = ["tests"]

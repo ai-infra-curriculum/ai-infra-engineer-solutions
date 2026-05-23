@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-flask
+  labels: { app: hello-flask }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: hello-flask }
+  template:
+    metadata:
+      labels: { app: hello-flask }
+    spec:
+      containers:
+        - name: app
+          image: hello-flask:0.1
+          imagePullPolicy: Never
+          ports: [{ containerPort: 8000 }]
+          readinessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 2
+          livenessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits:   { cpu: 500m, memory: 256Mi }

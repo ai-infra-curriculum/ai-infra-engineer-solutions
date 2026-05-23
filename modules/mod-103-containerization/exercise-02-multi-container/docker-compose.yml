@@ -1,0 +1,43 @@
+services:
+  api:
+    build: ./api
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: postgresql://ml:ml@db:5432/ml
+      REDIS_URL: redis://cache:6379/0
+    depends_on:
+      db: { condition: service_healthy }
+      cache: { condition: service_started }
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ml
+      POSTGRES_PASSWORD: ml
+      POSTGRES_DB: ml
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ml"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  cache:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "60", "1"]
+    volumes: ["redisdata:/data"]
+
+  prom:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    ports: ["9090:9090"]
+
+volumes:
+  pgdata: {}
+  redisdata: {}

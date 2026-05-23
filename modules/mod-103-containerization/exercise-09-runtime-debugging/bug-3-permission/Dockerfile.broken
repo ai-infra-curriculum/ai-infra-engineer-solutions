@@ -1,0 +1,7 @@
+FROM python:3.11-slim
+RUN useradd -u 10001 app
+USER app
+WORKDIR /data
+# BUG: /data is created by the volume mount at host UID 1000;
+# container UID 10001 cannot write there.
+CMD ["sh", "-c", "echo hello > /data/test.txt && cat /data/test.txt"]

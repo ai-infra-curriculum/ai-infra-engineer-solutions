@@ -1,0 +1,6 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY app.py .
+RUN pip install fastapi uvicorn
+# BUG: binds to localhost — unreachable from outside the container.
+CMD ["uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"]

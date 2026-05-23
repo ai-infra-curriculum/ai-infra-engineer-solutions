@@ -1,0 +1,21 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-signed-images
+spec:
+  validationFailureAction: Enforce
+  background: false
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: verify-cosign-signature
+      match:
+        any:
+          - resources: { kinds: [Pod] }
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/me/iris-api:*"
+          attestors:
+            - entries:
+                - keyless:
+                    subject: "https://github.com/me/iris-api/.github/workflows/sign-publish.yml@refs/heads/main"
+                    issuer:  "https://token.actions.githubusercontent.com"

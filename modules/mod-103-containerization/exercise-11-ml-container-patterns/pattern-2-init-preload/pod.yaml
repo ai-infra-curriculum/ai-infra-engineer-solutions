@@ -1,0 +1,27 @@
+# Pattern 2: init container preloads weights into a shared emptyDir.
+# Saves ~18s on restart vs downloading inside the main container.
+apiVersion: v1
+kind: Pod
+metadata: { name: iris-with-preload }
+spec:
+  volumes:
+    - name: models
+      emptyDir: { sizeLimit: 4Gi }
+  initContainers:
+    - name: preload
+      image: ghcr.io/me/model-fetcher:1.0   # tiny image: just curl + cp
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          set -e
+          curl -fsSL https://models.internal/iris/v3.bin -o /models/iris.bin
+          test -s /models/iris.bin
+      volumeMounts: [{ name: models, mountPath: /models }]
+  containers:
+    - name: iris-api
+      image: ghcr.io/me/iris-api:0.5
+      env: [{ name: MODEL_PATH, value: /models/iris.bin }]
+      volumeMounts: [{ name: models, mountPath: /models, readOnly: true }]
+      readinessProbe:
+        httpGet: { path: /ready, port: 8000 }
+        initialDelaySeconds: 1

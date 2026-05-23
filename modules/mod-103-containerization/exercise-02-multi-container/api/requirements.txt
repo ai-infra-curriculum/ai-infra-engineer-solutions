@@ -1,0 +1,5 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+asyncpg>=0.29
+redis>=5.0
+prometheus-client>=0.20

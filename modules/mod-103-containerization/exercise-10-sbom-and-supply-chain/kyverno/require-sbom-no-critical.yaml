@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-sbom-no-critical
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: require-cyclonedx-attestation
+      match:
+        any:
+          - resources: { kinds: [Pod] }
+      verifyImages:
+        - imageReferences: ["ghcr.io/me/iris-api:*"]
+          attestations:
+            - predicateType: https://cyclonedx.org/bom
+              attestors:
+                - entries:
+                    - keyless:
+                        subject: "https://github.com/me/iris-api/.github/workflows/sign-publish.yml@refs/heads/main"
+                        issuer:  "https://token.actions.githubusercontent.com"
+              conditions:
+                # No vulnerabilities with severity == "critical" allowed.
+                - all:
+                    - key: '{{ vulnerabilities[?ratings[?severity==`critical`]] | length(@) }}'
+                      operator: Equals
+                      value: 0

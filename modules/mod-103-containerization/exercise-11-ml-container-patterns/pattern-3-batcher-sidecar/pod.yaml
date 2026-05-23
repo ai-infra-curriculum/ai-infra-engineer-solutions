@@ -1,0 +1,12 @@
+# Pattern 3: sidecar batching.
+apiVersion: v1
+kind: Pod
+metadata: { name: iris-batched }
+spec:
+  containers:
+    - name: batcher
+      image: ghcr.io/me/batcher-sidecar:1.0
+      ports: [{ containerPort: 8000 }]
+    - name: model
+      image: ghcr.io/me/iris-batch-api:0.5     # exposes /batch_predict
+      ports: [{ containerPort: 8001 }]

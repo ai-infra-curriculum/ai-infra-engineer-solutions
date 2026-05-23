@@ -1,0 +1,7 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY load.py .
+RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
+# Run with: docker run --memory=2g bug-2
+# BUG: tries to load 13B model into 2G limit. OOMKilled at ~10s.
+CMD ["python", "load.py"]

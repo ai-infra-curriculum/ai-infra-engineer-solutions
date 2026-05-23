@@ -1,0 +1,7 @@
+FROM python:3.11-slim
+RUN useradd -u 10001 app
+WORKDIR /data
+# Chown the target before dropping privileges OR run pod with fsGroup.
+RUN mkdir -p /data && chown -R app:app /data
+USER app
+CMD ["sh", "-c", "echo hello > /data/test.txt && cat /data/test.txt"]

@@ -1,0 +1,14 @@
+experiments:
+  - id: iris-rf-v6-test-2026-05
+    description: "Test v0.6 (rf, n_est=500) vs v0.5 (n_est=200)"
+    starts: 2026-05-15T00:00:00Z
+    ends:   2026-05-29T00:00:00Z
+    variants:
+      control:   { weight: 0.5, model: "iris-rf:5" }
+      treatment: { weight: 0.5, model: "iris-rf:6" }
+    primary_metric: conversion_within_24h
+    guardrails:
+      - { metric: latency_p95_ms, max_increase_pct: 10 }
+      - { metric: error_rate_pct, max_value: 1 }
+    minimum_sample_size: 50000
+    minimum_detectable_effect_pct: 2

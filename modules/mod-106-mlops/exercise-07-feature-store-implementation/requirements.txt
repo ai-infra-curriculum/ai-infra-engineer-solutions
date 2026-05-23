@@ -1,0 +1,3 @@
+feast>=0.40
+duckdb>=1.0
+redis>=5.0

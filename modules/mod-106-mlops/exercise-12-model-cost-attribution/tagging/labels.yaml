@@ -1,0 +1,18 @@
+# Required labels on every ML resource. Enforced by Kyverno.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata: { name: require-model-labels }
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: require-model-name-team
+      match:
+        any:
+          - resources: { kinds: [Pod, Deployment, Job] }
+      validate:
+        message: "Resources must have model_name + team labels for cost attribution"
+        pattern:
+          metadata:
+            labels:
+              model_name: "?*"
+              team: "?*"

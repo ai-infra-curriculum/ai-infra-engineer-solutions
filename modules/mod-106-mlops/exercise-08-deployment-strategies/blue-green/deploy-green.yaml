@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: iris-api-green, labels: { color: green } }
+spec:
+  replicas: 6
+  selector: { matchLabels: { app: iris-api, color: green } }
+  template:
+    metadata: { labels: { app: iris-api, color: green } }
+    spec: { containers: [{ name: api, image: ghcr.io/me/iris-api:0.6 }] }

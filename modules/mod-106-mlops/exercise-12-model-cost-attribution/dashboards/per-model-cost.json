@@ -1,0 +1,12 @@
+{
+  "title": "Per-model cost (last 30 days)",
+  "type": "barchart",
+  "datasource": "Prometheus",
+  "targets": [
+    {
+      "expr": "sum by (model_name) (rate(model_cost_total_usd[30d])) * 30 * 24 * 3600",
+      "legendFormat": "{{model_name}}"
+    }
+  ],
+  "fieldConfig": { "defaults": { "unit": "currencyUSD" } }
+}

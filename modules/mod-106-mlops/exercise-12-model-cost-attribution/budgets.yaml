@@ -1,0 +1,17 @@
+budgets:
+  iris:
+    monthly_usd: 50
+    alert_threshold_pct: 80
+    contact: ml-platform-oncall
+  recs:
+    monthly_usd: 800
+    alert_threshold_pct: 80
+    contact: ml-platform-oncall
+  ltv:
+    monthly_usd: 150
+    alert_threshold_pct: 75
+    contact: data-science-oncall
+  fraud:
+    monthly_usd: 1200
+    alert_threshold_pct: 70
+    contact: trust-safety-oncall

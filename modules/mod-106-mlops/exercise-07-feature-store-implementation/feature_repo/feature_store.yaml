@@ -1,0 +1,10 @@
+project: ml_platform
+provider: local
+registry: registry.db
+online_store:
+  type: redis
+  connection_string: redis://localhost:6379
+offline_store:
+  type: duckdb
+  path: warehouse.duckdb
+entity_key_serialization_version: 2

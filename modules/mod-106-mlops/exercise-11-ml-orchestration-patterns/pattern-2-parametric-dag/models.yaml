@@ -1,0 +1,13 @@
+models:
+  - name: iris
+    dataset: s3://datalake/iris.parquet
+    schedule: "0 4 * * *"
+    team: ml-platform
+  - name: recs
+    dataset: s3://datalake/recs.parquet
+    schedule: "0 5 * * *"
+    team: ml-platform
+  - name: ltv
+    dataset: s3://datalake/ltv.parquet
+    schedule: "0 6 * * MON"
+    team: data-science

@@ -1,0 +1,25 @@
+# Istio: mirror 100% of traffic to candidate without affecting users.
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata: { name: iris-api }
+spec:
+  hosts: [iris-api]
+  http:
+    - route:
+        - destination: { host: iris-api, subset: prod }
+          weight: 100
+      mirror:
+        host: iris-api
+        subset: candidate
+      mirrorPercentage: { value: 100 }
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata: { name: iris-api }
+spec:
+  host: iris-api
+  subsets:
+    - name: prod
+      labels: { version: "0.5" }
+    - name: candidate
+      labels: { version: "0.6" }

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: iris-api }
+spec:
+  replicas: 6
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0       # zero downtime
+      maxSurge: 25%           # max 25% extra during rollout
+  selector: { matchLabels: { app: iris-api } }
+  template:
+    metadata: { labels: { app: iris-api } }
+    spec:
+      containers:
+        - name: iris-api
+          image: ghcr.io/me/iris-api:0.5
+          readinessProbe:
+            httpGet: { path: /ready, port: 8000 }
+            initialDelaySeconds: 3
+            periodSeconds: 5

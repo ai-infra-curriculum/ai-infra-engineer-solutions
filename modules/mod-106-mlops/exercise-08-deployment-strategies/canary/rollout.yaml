@@ -1,0 +1,38 @@
+# Argo Rollouts: gradual canary with automated analysis.
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata: { name: iris-api }
+spec:
+  replicas: 6
+  selector: { matchLabels: { app: iris-api } }
+  template:
+    metadata: { labels: { app: iris-api } }
+    spec: { containers: [{ name: api, image: ghcr.io/me/iris-api:0.6 }] }
+  strategy:
+    canary:
+      steps:
+        - setWeight: 10
+        - pause: { duration: 5m }
+        - analysis: { templates: [{ templateName: success-rate }] }
+        - setWeight: 25
+        - pause: { duration: 10m }
+        - analysis: { templates: [{ templateName: success-rate }] }
+        - setWeight: 50
+        - pause: { duration: 15m }
+        - setWeight: 100
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata: { name: success-rate }
+spec:
+  metrics:
+    - name: success-rate
+      provider:
+        prometheus:
+          address: http://prometheus:9090
+          query: |
+            sum(rate(http_requests_total{job="iris-api",status!~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{job="iris-api"}[5m]))
+      successCondition: result[0] >= 0.99
+      failureLimit: 1

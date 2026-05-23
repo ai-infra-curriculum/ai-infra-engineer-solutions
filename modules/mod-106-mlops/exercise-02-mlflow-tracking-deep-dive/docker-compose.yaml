@@ -1,0 +1,29 @@
+services:
+  pg:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: mlflow
+      POSTGRES_PASSWORD: mlflow
+      POSTGRES_DB: mlflow
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports: ["9000:9000", "9001:9001"]
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: adminadmin
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.16.0
+    ports: ["5000:5000"]
+    environment:
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: adminadmin
+    command: >
+      mlflow server
+        --host 0.0.0.0
+        --backend-store-uri postgresql://mlflow:mlflow@pg/mlflow
+        --default-artifact-root s3://mlflow/
+    depends_on: [pg, minio]

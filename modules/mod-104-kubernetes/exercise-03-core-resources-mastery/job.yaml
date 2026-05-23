@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata: { name: train-iris-2026-05-23, namespace: iris }
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: trainer
+          image: ghcr.io/me/iris-trainer:0.5
+          args: ["--data", "s3://datalake/iris.parquet", "--output", "s3://datalake/models/iris/v6"]
+          resources:
+            requests: { cpu: 2, memory: 8Gi }
+            limits:   { cpu: 4, memory: 12Gi }

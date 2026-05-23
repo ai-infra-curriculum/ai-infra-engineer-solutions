@@ -1,0 +1,21 @@
+# ServiceAccount that can read configmaps in its own namespace only.
+apiVersion: v1
+kind: ServiceAccount
+metadata: { name: iris-api, namespace: iris }
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: { name: iris-api-reader, namespace: iris }
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: { name: iris-api-reader, namespace: iris }
+roleRef: { apiGroup: rbac.authorization.k8s.io, kind: Role, name: iris-api-reader }
+subjects:
+  - kind: ServiceAccount
+    name: iris-api
+    namespace: iris

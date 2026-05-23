@@ -1,0 +1,12 @@
+{{ .Chart.Name }} v{{ .Chart.AppVersion }} deployed to {{ .Release.Namespace }}.
+
+Access:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "iris-api.fullname" . }} 8080:{{ .Values.service.port }}
+  curl http://localhost:8080/health
+
+{{- if .Values.ingress.enabled }}
+External URL: http{{ if .Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.host }}/
+{{- end }}
+
+Test the deployment:
+  helm test {{ .Release.Name }} -n {{ .Release.Namespace }}

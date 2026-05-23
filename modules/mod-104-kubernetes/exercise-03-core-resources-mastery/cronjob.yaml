@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata: { name: nightly-eval, namespace: iris }
+spec:
+  schedule: "0 4 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid    # never overlap runs
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: eval
+              image: ghcr.io/me/iris-evaluator:0.5
+              args: ["--model", "s3://datalake/models/iris/latest"]

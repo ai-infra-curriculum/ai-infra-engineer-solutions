@@ -1,0 +1,11 @@
+# MIG-partitioned: dev workloads share an A100 in 1g.5gb slices.
+apiVersion: v1
+kind: Pod
+metadata: { name: dev-experiment, namespace: ml-dev }
+spec:
+  nodeSelector: { "nvidia.com/mig.config": "all-1g.5gb" }
+  containers:
+    - name: jupyter
+      image: jupyter/datascience-notebook
+      resources:
+        limits: { "nvidia.com/mig-1g.5gb": 1 }

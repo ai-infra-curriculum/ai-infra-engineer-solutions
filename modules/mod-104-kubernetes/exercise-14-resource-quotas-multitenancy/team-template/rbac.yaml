@@ -1,0 +1,12 @@
+# Team owners get full access to their namespace; no cross-namespace access.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: { name: team-owners, namespace: team-${TEAM} }
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+  - kind: Group
+    name: ${TEAM}-owners
+    apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,27 @@
+# Default-deny ingress + egress except within team namespace + monitoring.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: default-deny, namespace: team-${TEAM} }
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: allow-intra-team-and-monitoring, namespace: team-${TEAM} }
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: { matchLabels: { team: ${TEAM} } }
+        - namespaceSelector: { matchLabels: { name: monitoring } }
+        - namespaceSelector: { matchLabels: { name: ingress-nginx } }
+  egress:
+    - to:
+        - namespaceSelector: { matchLabels: { team: ${TEAM} } }
+        - namespaceSelector: { matchLabels: { name: kube-system } }   # DNS
+    - to:
+        - ipBlock: { cidr: 0.0.0.0/0, except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16] }
+      ports:
+        - { port: 443, protocol: TCP }

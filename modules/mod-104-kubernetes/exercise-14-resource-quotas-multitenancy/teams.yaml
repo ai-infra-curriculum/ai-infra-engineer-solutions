@@ -1,0 +1,13 @@
+teams:
+  - name: ml-platform
+    cpu_req: "20",  cpu_lim: "40"
+    mem_req: "80Gi", mem_lim: "120Gi"
+    gpu: 4
+  - name: data-science
+    cpu_req: "10", cpu_lim: "20"
+    mem_req: "40Gi", mem_lim: "60Gi"
+    gpu: 2
+  - name: trust-safety
+    cpu_req: "5", cpu_lim: "10"
+    mem_req: "20Gi", mem_lim: "30Gi"
+    gpu: 1

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata: { name: pv-manual-ebs }
+spec:
+  capacity: { storage: 50Gi }
+  volumeMode: Filesystem
+  accessModes: [ReadWriteOnce]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  awsElasticBlockStore:
+    volumeID: "vol-0123456789abcdef0"
+    fsType: ext4
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: pvc-manual, namespace: iris }
+spec:
+  storageClassName: manual
+  accessModes: [ReadWriteOnce]
+  resources: { requests: { storage: 50Gi } }

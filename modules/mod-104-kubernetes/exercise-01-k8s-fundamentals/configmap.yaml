@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: iris-config, namespace: iris }
+data:
+  LOG_LEVEL: INFO
+  MODEL_VERSION: "0.5"
+  RATE_LIMIT_PER_MIN: "120"

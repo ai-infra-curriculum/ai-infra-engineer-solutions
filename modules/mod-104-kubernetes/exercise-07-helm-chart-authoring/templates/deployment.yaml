@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "iris-api.fullname" . }}
+  labels: {{- include "iris-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: {{- include "iris-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "iris-api.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "iris-api.fullname" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - { containerPort: 8000, name: http }
+          envFrom:
+            - configMapRef: { name: {{ include "iris-api.fullname" . }} }
+            {{- if .Values.secrets }}
+            - secretRef: { name: {{ include "iris-api.fullname" . }} }
+            {{- end }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            httpGet: { path: /ready, port: http }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 20

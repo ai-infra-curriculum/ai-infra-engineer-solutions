@@ -1,0 +1,22 @@
+# Time-sliced: 4 dev pods share one T4 (weak isolation; cheap)
+apiVersion: v1
+kind: Pod
+metadata: { name: notebook-alice, namespace: ml-dev }
+spec:
+  nodeSelector: { "nvidia.com/gpu.sharing-strategy": "time-slicing" }
+  containers:
+    - name: notebook
+      image: jupyter/scipy-notebook
+      resources:
+        limits: { nvidia.com/gpu: 1 }   # one of the 4 time slices
+---
+apiVersion: v1
+kind: Pod
+metadata: { name: notebook-bob, namespace: ml-dev }
+spec:
+  nodeSelector: { "nvidia.com/gpu.sharing-strategy": "time-slicing" }
+  containers:
+    - name: notebook
+      image: jupyter/scipy-notebook
+      resources:
+        limits: { nvidia.com/gpu: 1 }

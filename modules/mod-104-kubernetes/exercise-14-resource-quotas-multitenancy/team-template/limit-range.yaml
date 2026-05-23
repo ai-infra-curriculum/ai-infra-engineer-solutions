@@ -1,0 +1,10 @@
+# Default + max per-container limits (prevents single-pod hogging).
+apiVersion: v1
+kind: LimitRange
+metadata: { name: container-defaults, namespace: team-${TEAM} }
+spec:
+  limits:
+    - type: Container
+      default:        { cpu: 500m, memory: 512Mi }
+      defaultRequest: { cpu: 100m, memory: 256Mi }
+      max:            { cpu: 4,    memory: 8Gi }

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata: { name: team-quota, namespace: team-${TEAM} }
+spec:
+  hard:
+    requests.cpu: "${CPU_REQ}"
+    requests.memory: "${MEM_REQ}"
+    limits.cpu: "${CPU_LIM}"
+    limits.memory: "${MEM_LIM}"
+    requests.nvidia.com/gpu: "${GPU}"
+    persistentvolumeclaims: "10"
+    services.loadbalancers: "1"
+    count/pods: "50"
+    count/secrets: "30"

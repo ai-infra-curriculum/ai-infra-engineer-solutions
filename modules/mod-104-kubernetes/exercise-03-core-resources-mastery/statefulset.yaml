@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: { name: pg, namespace: iris }
+spec:
+  serviceName: pg-headless
+  replicas: 3
+  selector: { matchLabels: { app: pg } }
+  template:
+    metadata: { labels: { app: pg } }
+    spec:
+      containers:
+        - name: pg
+          image: postgres:16-alpine
+          env:
+            - { name: POSTGRES_USER,     value: iris }
+            - { name: POSTGRES_PASSWORD, value: iris }
+            - { name: POSTGRES_DB,       value: iris }
+          ports: [{ containerPort: 5432 }]
+          volumeMounts: [{ name: data, mountPath: /var/lib/postgresql/data }]
+  volumeClaimTemplates:
+    - metadata: { name: data }
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources: { requests: { storage: 20Gi } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: pg-headless, namespace: iris }
+spec:
+  clusterIP: None
+  selector: { app: pg }
+  ports: [{ port: 5432 }]

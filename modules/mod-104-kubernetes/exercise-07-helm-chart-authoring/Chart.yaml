@@ -1,0 +1,11 @@
+apiVersion: v2
+name: iris-api
+description: Helm chart for iris-api ML serving
+type: application
+version: 0.5.0
+appVersion: "0.5.0"
+dependencies:
+  - name: postgresql
+    version: 15.3.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled

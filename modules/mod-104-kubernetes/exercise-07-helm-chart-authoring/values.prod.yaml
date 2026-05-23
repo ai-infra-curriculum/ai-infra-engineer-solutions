@@ -1,0 +1,11 @@
+replicaCount: 6
+resources:
+  requests: { cpu: 500m, memory: 512Mi }
+  limits:   { cpu: 2,    memory: 2Gi }
+ingress:
+  host: iris.prod.example.com
+  tls: true
+autoscaling:
+  minReplicas: 6
+  maxReplicas: 50
+  targetCPU: 60

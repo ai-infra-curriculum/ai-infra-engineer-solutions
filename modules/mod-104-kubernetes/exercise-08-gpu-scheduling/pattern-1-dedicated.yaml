@@ -1,0 +1,14 @@
+# Dedicated full GPU: production inference, no sharing.
+apiVersion: v1
+kind: Pod
+metadata: { name: vllm-inference, namespace: iris }
+spec:
+  priorityClassName: gpu-critical
+  nodeSelector: { "nvidia.com/gpu": "true" }
+  tolerations: [{ key: "nvidia.com/gpu", operator: Exists, effect: NoSchedule }]
+  containers:
+    - name: vllm
+      image: vllm/vllm-openai:latest
+      args: ["--model", "mistralai/Mistral-7B-Instruct-v0.2"]
+      resources:
+        limits: { nvidia.com/gpu: 1 }

@@ -1,0 +1,13 @@
+# Cross-cluster service via Cilium ClusterMesh global service annotation.
+apiVersion: v1
+kind: Service
+metadata:
+  name: iris-api
+  namespace: iris
+  annotations:
+    service.cilium.io/global: "true"
+    service.cilium.io/affinity: "local"   # prefer local cluster, failover to remote
+spec:
+  type: ClusterIP
+  selector: { app: iris-api }
+  ports: [{ port: 80, targetPort: 8000 }]

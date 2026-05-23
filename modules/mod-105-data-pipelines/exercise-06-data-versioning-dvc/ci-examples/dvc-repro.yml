@@ -1,0 +1,21 @@
+# Copy to .github/workflows/dvc-repro.yml in your repo.
+name: dvc-repro
+on: [pull_request]
+
+jobs:
+  repro:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: iterative/setup-cml@v2
+      - uses: iterative/setup-dvc@v1
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - run: dvc pull
+      - run: dvc repro
+      - name: Compare metrics
+        run: |
+          echo "## Metrics diff" > report.md
+          dvc metrics diff main --md >> report.md
+          cml comment create report.md

@@ -1,0 +1,40 @@
+stages:
+  ingest:
+    cmd: python src/ingest.py
+    deps: [src/ingest.py]
+    outs:
+      - data/raw/
+
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+      - src/preprocess.py
+      - data/raw/
+    params:
+      - preprocess
+    outs:
+      - data/processed/
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data/processed/
+    params:
+      - train
+    outs:
+      - models/model.pkl
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/model.pkl
+      - data/processed/
+    metrics:
+      - metrics/eval.json:
+          cache: false
+    plots:
+      - plots/confusion-matrix.json:
+          cache: false
+          template: confusion

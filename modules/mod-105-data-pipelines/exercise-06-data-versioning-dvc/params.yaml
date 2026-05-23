@@ -1,0 +1,10 @@
+preprocess:
+  test_size: 0.2
+  random_seed: 42
+  scaler: standard
+
+train:
+  model: random_forest
+  n_estimators: 200
+  max_depth: 12
+  min_samples_leaf: 5

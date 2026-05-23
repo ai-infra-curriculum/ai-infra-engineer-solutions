@@ -1,0 +1,43 @@
+{
+  "expectation_suite_name": "training_data",
+  "meta": { "great_expectations_version": "0.18.0" },
+  "expectations": [
+    {"expectation_type": "expect_table_columns_to_match_ordered_list",
+      "kwargs": {"column_list": ["user_id","event_ts","item_id","event_type","price","category","session_id"]}},
+    {"expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {"column": "user_id", "type_": "INTEGER"}},
+    {"expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {"column": "price", "type_": "FLOAT"}},
+    {"expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {"column": "event_ts", "type_": "TIMESTAMP"}},
+
+    {"expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {"column": "user_id"}},
+    {"expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {"column": "event_ts"}},
+    {"expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {"column": "price", "min_value": 0, "max_value": 100000}},
+    {"expectation_type": "expect_column_values_to_be_in_set",
+      "kwargs": {"column": "event_type", "value_set": ["click","view","purchase","add_to_cart"]}},
+    {"expectation_type": "expect_column_value_lengths_to_be_between",
+      "kwargs": {"column": "category", "min_value": 1, "max_value": 64}},
+
+    {"expectation_type": "expect_column_pair_values_to_be_in_set",
+      "kwargs": {"column_A": "event_type", "column_B": "price", "value_pairs_set": []},
+      "meta": {"description": "purchase events MUST have price > 0", "active": false}},
+    {"expectation_type": "expect_compound_columns_to_be_unique",
+      "kwargs": {"column_list": ["user_id","event_ts","item_id","event_type"]}},
+    {"expectation_type": "expect_column_values_to_match_regex",
+      "kwargs": {"column": "session_id", "regex": "^[a-f0-9]{32}$"}},
+
+    {"expectation_type": "expect_column_kl_divergence_to_be_less_than",
+      "kwargs": {"column": "price", "partition_object": {
+        "values": [0, 10, 50, 200, 1000], "weights": [0.4, 0.3, 0.2, 0.08, 0.02]},
+        "threshold": 0.5}},
+    {"expectation_type": "expect_column_mean_to_be_between",
+      "kwargs": {"column": "price", "min_value": 10, "max_value": 200}},
+    {"expectation_type": "expect_column_value_counts_to_be_between",
+      "kwargs": {"column": "event_type", "value": "purchase",
+        "min_value_count": 100, "max_value_count": 1000000}}
+  ]
+}

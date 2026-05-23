@@ -1,0 +1,23 @@
+groups:
+  - name: data-pipeline
+    rules:
+      - alert: TrainingDataStale
+        expr: dataset_freshness_seconds{dataset="events.recs_training_v1"} > 6 * 3600
+        for: 30m
+        labels: { severity: critical, team: ml-platform }
+        annotations: { summary: "Recs training data not refreshed in >6h" }
+
+      - alert: ModelArtifactStale
+        expr: dataset_freshness_seconds{dataset="models.recs"} > 36 * 3600
+        for: 30m
+        labels: { severity: warning }
+        annotations: { summary: "Model not retrained in >36h" }
+
+      - alert: AirflowDagFailureRate
+        expr: |
+          sum(rate(airflow_dag_run_failed_count[1h]))
+          /
+          sum(rate(airflow_dag_run_total_count[1h])) > 0.1
+        for: 30m
+        labels: { severity: warning }
+        annotations: { summary: ">10% DAG failure rate over the last hour" }

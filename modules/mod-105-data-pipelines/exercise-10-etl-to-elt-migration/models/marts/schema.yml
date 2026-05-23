@@ -1,0 +1,14 @@
+version: 2
+models:
+  - name: agg_trips_daily
+    columns:
+      - name: day
+        tests: [not_null]
+      - name: pu_borough
+        tests: [not_null]
+      - name: trips
+        tests: [not_null]
+      - name: avg_fare
+        tests:
+          - not_null
+          - dbt_utils.accepted_range: { min_value: 0, max_value: 1000 }

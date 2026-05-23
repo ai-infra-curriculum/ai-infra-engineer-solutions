@@ -1,0 +1,19 @@
+services:
+  loki:
+    image: grafana/loki:3.0.0
+    ports: ["3100:3100"]
+    volumes: ["./loki-config.yaml:/etc/loki/local-config.yaml"]
+    command: -config.file=/etc/loki/local-config.yaml
+
+  vector:
+    image: timberio/vector:0.40-alpine
+    volumes:
+      - "./vector.toml:/etc/vector/vector.toml:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    depends_on: [loki]
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    ports: ["3000:3000"]
+    environment: { GF_AUTH_ANONYMOUS_ENABLED: "true", GF_AUTH_ANONYMOUS_ORG_ROLE: Admin }
+    depends_on: [loki]

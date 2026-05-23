@@ -1,0 +1,30 @@
+# Vector pipeline: docker stdout → parse JSON → enrich → Loki.
+
+[sources.docker]
+  type = "docker_logs"
+  include_containers = ["iris-api"]
+
+[transforms.parse]
+  type = "remap"
+  inputs = ["docker"]
+  source = '''
+  . = parse_json!(.message) ?? .
+  .trace_id = string!(.trace_id ?? "")
+  .level = string!(.levelname ?? "INFO")
+  .service = string!(.service ?? "unknown")
+  '''
+
+[transforms.drop_debug]
+  type = "filter"
+  inputs = ["parse"]
+  condition = '.level != "DEBUG"'
+
+[sinks.loki]
+  type = "loki"
+  inputs = ["drop_debug"]
+  endpoint = "http://loki:3100"
+  encoding.codec = "json"
+  # Low-cardinality labels only — message body stays unindexed.
+  labels.service = "{{ service }}"
+  labels.level = "{{ level }}"
+  labels.env = "prod"

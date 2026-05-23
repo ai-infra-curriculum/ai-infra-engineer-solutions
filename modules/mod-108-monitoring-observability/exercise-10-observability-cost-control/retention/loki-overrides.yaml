@@ -1,0 +1,15 @@
+# Loki per-tenant overrides (mounted at /etc/loki/runtime-overrides.yaml).
+# Retain ERROR/WARN long; INFO short; DEBUG dropped at ingest.
+overrides:
+  iris-api:
+    retention_period: 7d
+    retention_stream:
+      - selector: '{level="ERROR"}'
+        priority: 1
+        period: 90d
+      - selector: '{level="WARN"}'
+        priority: 2
+        period: 30d
+      - selector: '{level="DEBUG"}'
+        priority: 3
+        period: 0d        # drop immediately

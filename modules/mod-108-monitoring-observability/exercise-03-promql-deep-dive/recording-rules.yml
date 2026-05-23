@@ -1,0 +1,15 @@
+groups:
+  - name: iris-api-rates
+    interval: 30s
+    rules:
+      - record: path:http_requests:rate1m
+        expr: sum by (path) (rate(http_requests_total{job="iris-api"}[1m]))
+      - record: cluster:http_errors:ratio_rate5m
+        expr: |
+          sum(rate(http_requests_total{job="iris-api",status=~"5.."}[5m]))
+            /
+          sum(rate(http_requests_total{job="iris-api"}[5m]))
+      - record: iris:http:p95_latency:rate5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="iris-api"}[5m])))

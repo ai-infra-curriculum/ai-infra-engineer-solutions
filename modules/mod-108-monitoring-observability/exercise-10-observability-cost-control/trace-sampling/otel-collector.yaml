@@ -1,0 +1,32 @@
+# Tail sampling: keep 100% of errors + 100% of slow + 1% of normal.
+# Cuts trace bill ~90% with full coverage of interesting traces.
+receivers:
+  otlp:
+    protocols: { grpc: {}, http: {} }
+
+processors:
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 50000
+    policies:
+      - name: errors
+        type: status_code
+        status_code: { status_codes: [ERROR] }
+      - name: slow
+        type: latency
+        latency: { threshold_ms: 500 }
+      - name: probabilistic-baseline
+        type: probabilistic
+        probabilistic: { sampling_percentage: 1 }
+
+exporters:
+  otlp:
+    endpoint: tempo:4317
+    tls: { insecure: true }
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [tail_sampling]
+      exporters: [otlp]

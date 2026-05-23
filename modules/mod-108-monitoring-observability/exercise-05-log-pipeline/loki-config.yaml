@@ -1,0 +1,43 @@
+auth_enabled: false
+
+server: { http_listen_port: 3100 }
+
+common:
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore: { store: inmemory }
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index: { prefix: index_, period: 24h }
+
+# Retention: tiered by stream selector.
+limits_config:
+  retention_period: 30d
+  max_streams_per_user: 10000   # cardinality budget
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+
+# 7d for INFO, 30d for WARN/ERROR.
+compactor:
+  retention_enabled: true
+  retention_delete_delay: 2h
+  delete_request_store: filesystem
+
+ruler:
+  storage: { type: local, local: { directory: /loki/rules } }
+  rule_path: /loki/rules-temp
+  alertmanager_url: http://alertmanager:9093
+
+# Stream-level retention overrides via the runtime_config file
+# (mount runtime_overrides.yaml in production deployments).

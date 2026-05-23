@@ -1,0 +1,22 @@
+services:
+  tempo:
+    image: grafana/tempo:2.5.0
+    command: -config.file=/etc/tempo.yaml
+    volumes: ["./tempo.yaml:/etc/tempo.yaml"]
+    ports: ["3200:3200", "4317:4317"]
+
+  feature-store:
+    build: { context: ., dockerfile: Dockerfile }
+    command: uvicorn feature_store:app --host 0.0.0.0 --port 8000
+    depends_on: [tempo]
+
+  backend:
+    build: { context: ., dockerfile: Dockerfile }
+    command: uvicorn backend:app --host 0.0.0.0 --port 8000
+    depends_on: [feature-store]
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    ports: ["3000:3000"]
+    environment: { GF_AUTH_ANONYMOUS_ENABLED: "true", GF_AUTH_ANONYMOUS_ORG_ROLE: Admin }
+    depends_on: [tempo]

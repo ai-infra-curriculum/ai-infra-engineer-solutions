@@ -1,0 +1,23 @@
+# Apply in Prometheus scrape config to drop high-cardinality labels.
+metric_relabel_configs:
+  # Drop the per-pod IP label (huge cardinality, low value)
+  - regex: 'pod_ip'
+    action: labeldrop
+
+  # Drop replicaset hash from pod label (keeps deployment-level grouping)
+  - source_labels: [pod]
+    regex: '(.+)-[a-z0-9]{8,10}-[a-z0-9]{5}'
+    target_label: pod
+    replacement: '${1}'
+
+  # Drop k8s_uid (one new series per pod restart)
+  - regex: 'uid'
+    action: labeldrop
+
+  # Drop high-cardinality status labels — keep status_class only
+  - source_labels: [status]
+    regex: '([1-5]).{2}'
+    target_label: status_class
+    replacement: '${1}xx'
+  - regex: 'status'
+    action: labeldrop

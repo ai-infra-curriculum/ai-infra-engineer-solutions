@@ -1,0 +1,33 @@
+groups:
+  - name: iris-api-sli
+    interval: 30s
+    rules:
+      - record: sli:availability:ratio_rate5m
+        expr: |
+          sum(rate(http_requests_total{job="iris-api",status!~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="iris-api"}[5m]))
+
+      - record: sli:availability:ratio_rate30m
+        expr: |
+          sum(rate(http_requests_total{job="iris-api",status!~"5.."}[30m]))
+          /
+          sum(rate(http_requests_total{job="iris-api"}[30m]))
+
+      - record: sli:availability:ratio_rate1h
+        expr: |
+          sum(rate(http_requests_total{job="iris-api",status!~"5.."}[1h]))
+          /
+          sum(rate(http_requests_total{job="iris-api"}[1h]))
+
+      - record: sli:availability:ratio_rate6h
+        expr: |
+          sum(rate(http_requests_total{job="iris-api",status!~"5.."}[6h]))
+          /
+          sum(rate(http_requests_total{job="iris-api"}[6h]))
+
+      - record: sli:latency:under_200ms_ratio_rate5m
+        expr: |
+          sum(rate(http_request_duration_seconds_bucket{job="iris-api",le="0.2"}[5m]))
+          /
+          sum(rate(http_request_duration_seconds_count{job="iris-api"}[5m]))

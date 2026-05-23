@@ -1,0 +1,50 @@
+global:
+  resolve_timeout: 5m
+  slack_api_url: https://hooks.slack.com/services/REDACTED
+
+templates:
+  - /etc/alertmanager/templates/*.tmpl
+
+route:
+  group_by: ['service', 'alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  receiver: 'slack-warnings'           # default catch-all
+  routes:
+    - matchers: [ severity = "critical" ]
+      receiver: 'pagerduty-and-slack-critical'
+      group_wait: 10s
+      continue: true
+    - matchers: [ severity = "warning" ]
+      receiver: 'slack-warnings'
+    - matchers: [ severity = "info" ]
+      receiver: 'email-info'
+
+inhibit_rules:
+  - source_matchers: [ alertname = "TargetDown" ]
+    target_matchers: [ alertname = "HighErrorRate" ]
+    equal: [ service ]
+  - source_matchers: [ alertname = "HighErrorRate" ]
+    target_matchers: [ alertname = "SlowResponses" ]
+    equal: [ service ]
+
+receivers:
+  - name: 'pagerduty-and-slack-critical'
+    pagerduty_configs:
+      - service_key: 'REDACTED'
+        description: '{{ template "pd.description" . }}'
+    slack_configs:
+      - channel: '#alerts-critical'
+        title: '{{ template "slack.title" . }}'
+        text: '{{ template "slack.text" . }}'
+  - name: 'slack-warnings'
+    slack_configs:
+      - channel: '#alerts-warnings'
+        title: '{{ template "slack.title" . }}'
+        text: '{{ template "slack.text" . }}'
+  - name: 'email-info'
+    email_configs:
+      - to: 'platform-info@example.com'
+        from: 'alertmanager@example.com'
+        smarthost: 'smtp.example.com:587'

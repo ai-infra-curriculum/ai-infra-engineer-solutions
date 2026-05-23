@@ -1,0 +1,79 @@
+groups:
+  - name: model-api-thresholds
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{job="iris-api",status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="iris-api"}[5m])) > 0.05
+        for: 5m
+        labels: { severity: critical, service: iris-api, team: ml-platform }
+        annotations:
+          summary: "5xx error rate > 5% for 5m"
+          runbook_url: "https://runbooks.example.com/high-error-rate"
+
+      - alert: TargetDown
+        expr: up{job="iris-api"} == 0
+        for: 2m
+        labels: { severity: critical, service: iris-api, team: ml-platform }
+        annotations: { summary: "Prometheus target down" }
+
+      - alert: SlowResponses
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="iris-api"}[5m]))) > 0.5
+        for: 10m
+        labels: { severity: warning, service: iris-api }
+        annotations: { summary: "p95 > 500ms for 10m" }
+
+      - alert: PodRestartingFrequently
+        expr: increase(kube_pod_container_status_restarts_total[1h]) > 3
+        for: 5m
+        labels: { severity: warning, service: iris-api }
+        annotations: { summary: "Pod restarted >3 times in last 1h" }
+
+      - alert: HighMemoryPressure
+        expr: |
+          container_memory_working_set_bytes{pod=~"iris-api.*"}
+          / container_spec_memory_limit_bytes{pod=~"iris-api.*"} > 0.9
+        for: 5m
+        labels: { severity: warning, service: iris-api }
+        annotations: { summary: "Memory > 90% of limit" }
+
+      - alert: DiskFillingFast
+        expr: predict_linear(node_filesystem_avail_bytes[1h], 4*3600) < 0
+        for: 10m
+        labels: { severity: warning, service: node }
+        annotations: { summary: "Disk projected full in 4h" }
+
+      - alert: HighCpuThrottling
+        expr: |
+          rate(container_cpu_cfs_throttled_seconds_total{pod=~"iris-api.*"}[5m]) > 0.5
+        for: 10m
+        labels: { severity: info, service: iris-api }
+        annotations: { summary: "CPU throttled > 0.5s/s for 10m" }
+
+      - alert: ModelDriftHigh
+        expr: model_drift_psi > 0.25
+        for: 30m
+        labels: { severity: warning, service: iris-api, team: data-science }
+        annotations: { summary: "Population drift PSI > 0.25 for 30m" }
+
+  - name: model-api-slo-burn
+    rules:
+      # Multi-window multi-burn-rate (Google SRE)
+      - alert: ErrorBudgetBurnFast
+        expr: |
+          ( (1 - sli:availability:ratio_rate1h)  / (1 - 0.995) > 14.4 )
+          and
+          ( (1 - sli:availability:ratio_rate5m)  / (1 - 0.995) > 14.4 )
+        labels: { severity: critical, service: iris-api, slo_burn: "1h+5m" }
+        annotations: { summary: "Burning 30d budget in <2 days" }
+
+      - alert: ErrorBudgetBurnSlow
+        expr: |
+          ( (1 - sli:availability:ratio_rate6h)  / (1 - 0.995) > 6 )
+          and
+          ( (1 - sli:availability:ratio_rate30m) / (1 - 0.995) > 6 )
+        labels: { severity: warning, service: iris-api, slo_burn: "6h+30m" }
+        annotations: { summary: "Burning 30d budget in <5 days" }

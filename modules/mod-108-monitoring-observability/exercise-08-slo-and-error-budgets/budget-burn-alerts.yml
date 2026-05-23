@@ -1,0 +1,18 @@
+groups:
+  - name: iris-api-burn
+    rules:
+      # Page if 5m+1h windows BOTH burning > 14.4x rate (30d budget gone in 2d)
+      - alert: BudgetBurnPage
+        expr: |
+          ( (1 - sli:availability:ratio_rate1h) / 0.005 > 14.4 )
+          and
+          ( (1 - sli:availability:ratio_rate5m) / 0.005 > 14.4 )
+        labels: { severity: critical, slo: availability }
+
+      # Ticket if 30m+6h windows BOTH burning > 6x rate (budget gone in 5d)
+      - alert: BudgetBurnTicket
+        expr: |
+          ( (1 - sli:availability:ratio_rate6h)  / 0.005 > 6 )
+          and
+          ( (1 - sli:availability:ratio_rate30m) / 0.005 > 6 )
+        labels: { severity: warning, slo: availability }

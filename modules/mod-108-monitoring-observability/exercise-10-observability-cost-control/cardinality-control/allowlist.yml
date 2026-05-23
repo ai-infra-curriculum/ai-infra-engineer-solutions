@@ -1,0 +1,13 @@
+# Whitelist only metrics we actively query.
+# Drop everything else at scrape time.
+metric_relabel_configs:
+  - source_labels: [__name__]
+    regex: |
+      (http_requests_total|http_request_duration_seconds_(bucket|count|sum)|
+      kube_pod_(status|container)_.+|
+      container_cpu_usage_seconds_total|
+      container_memory_working_set_bytes|
+      container_spec_(cpu|memory)_.+|
+      model_drift_psi|predictions_total|
+      up|prometheus_.+)
+    action: keep

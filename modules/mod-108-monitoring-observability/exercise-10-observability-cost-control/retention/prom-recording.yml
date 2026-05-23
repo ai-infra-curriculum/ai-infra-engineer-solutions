@@ -1,0 +1,15 @@
+# Downsample 1m metrics → 1h aggregates retained 1y.
+# Pair with Thanos/Mimir for cheap long-term storage.
+groups:
+  - name: downsampled-1h
+    interval: 1h
+    rules:
+      - record: instance:http_requests:rate_1h_avg
+        expr: avg_over_time(sum(rate(http_requests_total[5m]))[1h:5m])
+      - record: instance:http_errors:rate_1h_avg
+        expr: avg_over_time(sum(rate(http_requests_total{status=~"5.."}[5m]))[1h:5m])
+      - record: instance:p95_latency:1h_avg
+        expr: |
+          avg_over_time(
+            histogram_quantile(0.95,
+              sum by (le) (rate(http_request_duration_seconds_bucket[5m])))[1h:5m])

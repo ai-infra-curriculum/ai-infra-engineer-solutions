@@ -1,0 +1,23 @@
+{
+  "Rules": [
+    {
+      "ID": "loki-chunks-tiering",
+      "Filter": { "Prefix": "loki/chunks/" },
+      "Status": "Enabled",
+      "Transitions": [
+        { "Days": 30, "StorageClass": "STANDARD_IA" },
+        { "Days": 90, "StorageClass": "GLACIER_IR" }
+      ],
+      "Expiration": { "Days": 365 }
+    },
+    {
+      "ID": "tempo-blocks-tiering",
+      "Filter": { "Prefix": "tempo/blocks/" },
+      "Status": "Enabled",
+      "Transitions": [
+        { "Days": 14, "StorageClass": "STANDARD_IA" }
+      ],
+      "Expiration": { "Days": 90 }
+    }
+  ]
+}

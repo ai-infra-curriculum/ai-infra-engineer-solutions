@@ -1,0 +1,21 @@
+{
+  "title": "Availability Budget Burn",
+  "type": "timeseries",
+  "datasource": "Prometheus",
+  "targets": [
+    {
+      "expr": "1 - ((1 - avg_over_time(sli:availability:ratio_rate5m[30d])) / 0.005)",
+      "legendFormat": "budget remaining (30d)"
+    },
+    {
+      "expr": "(1 - sli:availability:ratio_rate1h) / 0.005",
+      "legendFormat": "1h burn rate (x)"
+    },
+    {
+      "expr": "(1 - sli:availability:ratio_rate6h) / 0.005",
+      "legendFormat": "6h burn rate (x)"
+    }
+  ],
+  "fieldConfig": { "defaults": { "unit": "percentunit" } },
+  "options": { "legend": { "displayMode": "table" } }
+}

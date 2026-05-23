@@ -1,0 +1,22 @@
+# Run each of these and record the result as your baseline.
+
+# Prometheus active series
+prometheus_tsdb_head_series
+
+# Per-metric series count (top 20 offenders)
+topk(20, count by (__name__) ({__name__=~".+"}))
+
+# Prometheus storage usage
+prometheus_tsdb_storage_blocks_bytes
+
+# Loki bytes ingested (monthly projection)
+sum(rate(loki_distributor_bytes_received_total[1h])) * 3600 * 24 * 30
+
+# Loki active stream count
+sum(loki_ingester_streams_created_total) - sum(loki_ingester_streams_removed_total)
+
+# Tempo spans/sec
+sum(rate(tempo_distributor_spans_received_total[5m]))
+
+# Grafana queries/sec
+sum(rate(grafana_http_request_duration_seconds_count[5m]))

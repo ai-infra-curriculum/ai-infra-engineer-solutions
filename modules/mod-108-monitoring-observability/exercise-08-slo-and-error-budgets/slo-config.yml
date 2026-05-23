@@ -1,0 +1,32 @@
+# Sloth-format SLO spec.
+version: prometheus/v1
+service: iris-api
+labels:
+  team: ml-platform
+slos:
+  - name: availability
+    objective: 99.5
+    description: "5xx-free responses over 30 days"
+    sli:
+      events:
+        error_query: 'sum(rate(http_requests_total{job="iris-api",status=~"5.."}[{{.window}}]))'
+        total_query: 'sum(rate(http_requests_total{job="iris-api"}[{{.window}}]))'
+    alerting:
+      name: IrisApiAvailabilityBudgetBurn
+      page_alert: { labels: { severity: critical } }
+      ticket_alert: { labels: { severity: warning } }
+
+  - name: latency
+    objective: 95
+    description: "p95 under 200ms over 30 days"
+    sli:
+      events:
+        error_query: |
+          sum(rate(http_request_duration_seconds_count{job="iris-api"}[{{.window}}]))
+          -
+          sum(rate(http_request_duration_seconds_bucket{job="iris-api",le="0.2"}[{{.window}}]))
+        total_query: 'sum(rate(http_request_duration_seconds_count{job="iris-api"}[{{.window}}]))'
+    alerting:
+      name: IrisApiLatencyBudgetBurn
+      page_alert: { labels: { severity: critical } }
+      ticket_alert: { labels: { severity: warning } }

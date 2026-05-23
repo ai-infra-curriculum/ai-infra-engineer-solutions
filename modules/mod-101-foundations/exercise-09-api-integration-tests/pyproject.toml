@@ -1,0 +1,9 @@
+[tool.pytest.ini_options]
+addopts = "-ra -q --strict-markers"
+markers = [
+    "unit: fast, no IO",
+    "contract: in-process HTTP",
+    "integration: containerized, slow",
+    "consumer_contract: pact-style",
+]
+testpaths = ["tests"]

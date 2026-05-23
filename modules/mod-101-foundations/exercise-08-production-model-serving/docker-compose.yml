@@ -1,0 +1,20 @@
+services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    environment:
+      MODEL_SERVE_MODEL_PATH: /models/iris.joblib
+      MODEL_SERVE_MODEL_VERSION: v1
+      MODEL_SERVE_FEATURE_COUNT: "4"
+      MODEL_SERVE_LOG_LEVEL: INFO
+      MODEL_SERVE_RATE_LIMIT_PER_MIN: "60"
+    volumes:
+      - ./models:/models:ro
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    ports: ["9090:9090"]
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro

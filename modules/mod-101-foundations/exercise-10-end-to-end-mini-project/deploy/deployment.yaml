@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iris-api
+  labels: { app: iris-api }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: iris-api } }
+  template:
+    metadata: { labels: { app: iris-api } }
+    spec:
+      containers:
+        - name: api
+          image: iris-api:IMAGE_TAG
+          imagePullPolicy: Never
+          ports: [{ containerPort: 8000, name: http }]
+          env:
+            - { name: MODEL_SERVE_MODEL_PATH, value: /models/iris.joblib }
+            - { name: MODEL_SERVE_FEATURE_COUNT, value: "4" }
+          readinessProbe:
+            httpGet: { path: /ready, port: 8000 }
+            initialDelaySeconds: 3
+          livenessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits:   { cpu: 500m, memory: 512Mi }

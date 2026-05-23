@@ -24,6 +24,12 @@ This repository contains **complete, production-ready implementations** of all p
 
 ## ✨ What's New
 
+**2026-05-23 — Phase D complete: 100% exercise coverage**
+
+All 119 learning exercises across all 10 modules now have reference solutions. Working
+code/configs/manifests + benchmarks where applicable. See [`SOLUTIONS_INDEX.md`](./SOLUTIONS_INDEX.md)
+for the full coverage matrix.
+
 **Recently Added Content:**
 - 📝 **Comprehensive Quizzes** - 265+ quiz questions added across modules 102-110 in the learning repository
   - Module 102: Cloud Computing (50 questions: mid-module + final)

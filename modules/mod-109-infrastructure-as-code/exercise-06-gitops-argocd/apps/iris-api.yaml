@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: iris-api
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/me/iris-api-manifests
+    targetRevision: main
+    path: helm/iris-api
+    helm:
+      valueFiles: ["values.yaml", "values.prod.yaml"]
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: iris
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: ["CreateNamespace=true", "ServerSideApply=true"]
+    retry:
+      limit: 5
+      backoff: { duration: 5s, factor: 2, maxDuration: 3m }

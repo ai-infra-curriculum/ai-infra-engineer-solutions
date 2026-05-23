@@ -1,0 +1,15 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata: { name: require-signed-images }
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: cosign-verify
+      match: { any: [{ resources: { kinds: [Pod] } }] }
+      verifyImages:
+        - imageReferences: ["ghcr.io/me/*"]
+          attestors:
+            - entries:
+                - keyless:
+                    subject: "https://github.com/me/*/.github/workflows/*"
+                    issuer:  "https://token.actions.githubusercontent.com"

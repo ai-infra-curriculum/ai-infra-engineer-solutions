@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata: { name: iris-multi-env, namespace: argocd }
+spec:
+  generators:
+    - list:
+        elements:
+          - { env: dev,     replicas: "1" }
+          - { env: staging, replicas: "2" }
+          - { env: prod,    replicas: "6" }
+  template:
+    metadata: { name: "iris-{{ env }}" }
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/me/iris-api-manifests
+        targetRevision: HEAD
+        path: helm/iris-api
+        helm:
+          parameters:
+            - { name: replicas, value: "{{ replicas }}" }
+            - { name: env,      value: "{{ env }}" }
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "iris-{{ env }}"
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+        syncOptions: ["CreateNamespace=true"]

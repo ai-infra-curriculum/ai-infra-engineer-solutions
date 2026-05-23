@@ -1,0 +1,13 @@
+budgets:
+  ml-platform:
+    monthly_usd: 5000
+    warning_threshold_pct: 80
+    pr_block_threshold_pct: 95
+  data-science:
+    monthly_usd: 1500
+    warning_threshold_pct: 80
+    pr_block_threshold_pct: 95
+  trust-safety:
+    monthly_usd: 800
+    warning_threshold_pct: 75
+    pr_block_threshold_pct: 90

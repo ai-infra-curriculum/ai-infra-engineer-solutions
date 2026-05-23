@@ -1,0 +1,10 @@
+teams:
+  - name: ml-platform
+    owners: ["alice@example.com", "bob@example.com"]
+    gpu_quota: 8
+  - name: data-science
+    owners: ["carol@example.com"]
+    gpu_quota: 4
+  - name: trust-safety
+    owners: ["dave@example.com"]
+    gpu_quota: 2

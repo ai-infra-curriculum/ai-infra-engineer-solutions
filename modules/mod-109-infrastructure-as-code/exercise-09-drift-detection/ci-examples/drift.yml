@@ -1,0 +1,19 @@
+# Copy to .github/workflows/drift.yml in your repo.
+name: drift-detection
+on:
+  schedule:
+    - cron: '0 7 * * *'    # 07:00 UTC every day
+  workflow_dispatch:
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - uses: hashicorp/setup-terraform@v3
+      - run: pip install httpx
+      - run: python drift_check.py | python classify.py > drift-report.json
+      - uses: actions/upload-artifact@v4
+        with: { name: drift-report, path: drift-report.json }

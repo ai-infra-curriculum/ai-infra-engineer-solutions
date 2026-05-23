@@ -1,0 +1,17 @@
+# Copy to .github/workflows/conftest.yml in your repo.
+name: terraform-policy
+on: [pull_request]
+
+jobs:
+  conftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init -backend=false
+      - run: terraform plan -out=plan.binary
+      - run: terraform show -json plan.binary > plan.json
+      - uses: instrumenta/conftest-action@master
+        with:
+          files: plan.json
+          policy: opa/

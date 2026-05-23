@@ -1,0 +1,16 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata: { name: disallow-host-namespace }
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: deny-host-pid-net-ipc
+      match: { any: [{ resources: { kinds: [Pod] } }] }
+      validate:
+        message: "Host namespaces are forbidden"
+        deny:
+          conditions:
+            any:
+              - { key: "{{ request.object.spec.hostPID }}",     operator: Equals, value: true }
+              - { key: "{{ request.object.spec.hostNetwork }}", operator: Equals, value: true }
+              - { key: "{{ request.object.spec.hostIPC }}",     operator: Equals, value: true }

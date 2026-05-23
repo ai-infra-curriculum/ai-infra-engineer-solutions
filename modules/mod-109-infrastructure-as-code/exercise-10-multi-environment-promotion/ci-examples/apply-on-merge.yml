@@ -1,0 +1,38 @@
+# Copy to .github/workflows/apply.yml in your repo.
+name: apply
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+jobs:
+  dev:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init
+      - run: terraform apply -var-file=envs/dev/terraform.tfvars -auto-approve
+
+  staging:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [dev]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init
+      - run: terraform apply -var-file=envs/staging/terraform.tfvars -auto-approve
+
+  prod:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [staging]
+    environment:
+      name: production    # requires manual approval in GitHub UI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init
+      - run: terraform apply -var-file=envs/prod/terraform.tfvars -auto-approve

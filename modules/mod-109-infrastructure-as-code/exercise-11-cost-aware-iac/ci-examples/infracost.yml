@@ -1,0 +1,19 @@
+# Copy to .github/workflows/infracost.yml in your repo.
+name: infracost
+on: [pull_request]
+
+jobs:
+  cost:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: infracost/actions/setup@v3
+        with: { api-key: ${{ secrets.INFRACOST_API_KEY }} }
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init && terraform plan -out=plan.bin && terraform show -json plan.bin > plan.json
+      - run: infracost breakdown --path=plan.json --format=json --out-file=infracost.json
+      - run: infracost comment github --path infracost.json --repo ${{ github.repository }} --pull-request ${{ github.event.number }} --github-token ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install pyyaml
+      - run: python enforce.py --infracost infracost.json --budgets budgets.yaml --team ml-platform --current-spend 3200

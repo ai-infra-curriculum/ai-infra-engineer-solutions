@@ -1,0 +1,28 @@
+# Copy to .github/workflows/plan-on-pr.yml in your repo.
+name: plan-on-pr
+on: [pull_request]
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: { env: [dev, staging, prod] }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init
+      - run: terraform plan -var-file=envs/${{ matrix.env }}/terraform.tfvars -no-color > plan-${{ matrix.env }}.txt
+      - uses: actions/github-script@v7
+        env:
+          ENV: ${{ matrix.env }}
+        with:
+          script: |
+            const fs = require('fs');
+            const env = process.env.ENV;
+            const plan = fs.readFileSync(`plan-${env}.txt`, 'utf8');
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              body: `### Plan for \`${env}\`\n\`\`\`\n${plan.slice(0, 60000)}\n\`\`\``,
+            });

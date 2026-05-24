@@ -12,7 +12,7 @@ This solutions repository is designed to **complement**, not replace, the learni
 
 **Recommended Approach:**
 
-1. **Complete prerequisite learning** from the [learning repository](../../../learning/ai-infra-engineer-learning/)
+1. **Complete prerequisite learning** from the [learning repository](https://github.com/ai-infra-curriculum/ai-infra-engineer-learning)
 2. **Read module materials** relevant to the project
 3. **Understand project requirements** thoroughly
 4. **Attempt implementation yourself** using the stubs

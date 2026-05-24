@@ -9,7 +9,7 @@
 
 ## 🎯 Overview
 
-This repository contains **complete, production-ready implementations** of all projects from the [AI Infrastructure Engineer Learning Repository](../../../learning/ai-infra-engineer-learning). Each project includes:
+This repository contains **complete, production-ready implementations** of all projects from the [AI Infrastructure Engineer Learning Repository](https://github.com/ai-infra-curriculum/ai-infra-engineer-learning). Each project includes:
 
 - ✅ **Fully functional code** - No stubs, complete implementations
 - 📚 **Step-by-step guides** - Detailed implementation walkthroughs
@@ -347,7 +347,7 @@ This curriculum was developed as part of the AI Infrastructure Career Path proje
 
 ## 🔗 Related Repositories
 
-- **[ai-infra-engineer-learning](../../../learning/ai-infra-engineer-learning/)** - Learning materials and project stubs
+- **[ai-infra-engineer-learning](https://github.com/ai-infra-curriculum/ai-infra-engineer-learning)** - Learning materials and project stubs
 - **[ai-infra-senior-engineer-solutions](../ai-infra-senior-engineer-solutions/)** - Senior-level solutions (coming soon)
 - **[ai-infra-architect-solutions](../ai-infra-architect-solutions/)** - Architect-level solutions (coming soon)
 

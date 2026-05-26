@@ -348,8 +348,8 @@ This curriculum was developed as part of the AI Infrastructure Career Path proje
 ## 🔗 Related Repositories
 
 - **[ai-infra-engineer-learning](https://github.com/ai-infra-curriculum/ai-infra-engineer-learning)** - Learning materials and project stubs
-- **[ai-infra-senior-engineer-solutions](../ai-infra-senior-engineer-solutions/)** - Senior-level solutions (coming soon)
-- **[ai-infra-architect-solutions](../ai-infra-architect-solutions/)** - Architect-level solutions (coming soon)
+- **[ai-infra-senior-engineer-solutions](https://github.com/ai-infra-curriculum/ai-infra-senior-engineer-solutions)** - Senior-level solutions (10 modules, 4 projects, 50 reference solutions)
+- **[ai-infra-architect-solutions](https://github.com/ai-infra-curriculum/ai-infra-architect-solutions)** - Architect-level solutions (10 modules, 5 projects, 50 reference solutions)
 
 ---
 

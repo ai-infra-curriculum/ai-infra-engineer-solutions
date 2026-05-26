@@ -1,22 +1,41 @@
 """
-Acr Module
+Azure Container Registry (ACR) implementation.
 
-TODO: Implement acr functionality
+Concrete Registry subclass that defaults to the InMemoryRegistry path
+for CI and exposes a hook for the azure-mgmt-containerregistry client.
 """
 
-import logging
+from __future__ import annotations
 
-logger = logging.getLogger(__name__)
+from typing import Any, List, Optional
+
+from .base import InMemoryRegistry
 
 
-class Acr:
-    """Main class for acr"""
+class ACRRegistry(InMemoryRegistry):
+    """Azure Container Registry."""
 
-    def __init__(self):
-        """Initialize acr"""
-        logger.info("Initializing acr")
+    provider = "acr"
 
-    def process(self):
-        """Main processing logic"""
-        # TODO: Implement
-        pass
+    def __init__(
+        self,
+        *,
+        registry_name: str,
+        region: str = "eastus",
+        client: Optional[Any] = None,
+    ):
+        super().__init__(
+            name=f"{registry_name}.azurecr.io",
+            region=region,
+        )
+        self.registry_name = registry_name
+        self._client = client
+
+    @property
+    def is_live(self) -> bool:
+        return self._client is not None
+
+    def list_repositories(self) -> List[str]:
+        if self.is_live:
+            return list(self._client.list_repositories())
+        return super().list_repositories()

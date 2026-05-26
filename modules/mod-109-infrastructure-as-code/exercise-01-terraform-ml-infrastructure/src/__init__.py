@@ -1,11 +1,33 @@
-"""
-Src Package
+"""Terraform ML infrastructure tooling."""
 
-This package provides functionality for the src component.
-"""
+from .terraform_builder import (
+    CostEstimate,
+    Environment,
+    EnvironmentSpec,
+    MLInfrastructureBuilder,
+    PlatformConfig,
+    TerraformModuleSet,
+    TerraformOutput,
+    TerraformResource,
+    ValidationIssue,
+    ValidationReport,
+    estimate_monthly_cost,
+    validate_module,
+)
+
+__all__ = [
+    "CostEstimate",
+    "Environment",
+    "EnvironmentSpec",
+    "MLInfrastructureBuilder",
+    "PlatformConfig",
+    "TerraformModuleSet",
+    "TerraformOutput",
+    "TerraformResource",
+    "ValidationIssue",
+    "ValidationReport",
+    "estimate_monthly_cost",
+    "validate_module",
+]
 
 __version__ = "1.0.0"
-__author__ = "AI Infrastructure Engineer"
-
-# Package exports
-__all__ = []

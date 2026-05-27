@@ -24,10 +24,11 @@ This repository contains **complete, production-ready implementations** of all p
 
 ## ✨ What's New
 
-**2026-05-27 — Module-level rationale docs + CI runtime validation**
+**2026-05-27 — Module-level rationale docs + CI runtime validation + layout cleanup**
 
 - Added module-level `SOLUTION.md` design-rationale docs for all 10 modules (mod-101 through mod-110). Each doc explains *why* the reference implementations are shaped the way they are — what trade-offs were accepted, common grader-observed mistakes, and when to go beyond. Complements the existing per-exercise `SOLUTION_GUIDE.md` walkthroughs.
 - CI workflow now includes runtime validation gates: `kubectl apply --dry-run=client`, `terraform validate`, and a cache-only `docker buildx build` smoke for every relevant artifact under `modules/`. Each gate auto-skips when no relevant artifacts are present.
+- Renamed `modules/mod-110-llm-infrastructure/exercise-12-llm-scoring-harness/` → `exercise-12-llm-evaluation-harness/` so the directory matches the paired learning-side exercise file name.
 - Audit score: 58 → 64.
 
 **2026-05-23 — Phase D complete: 100% exercise coverage**

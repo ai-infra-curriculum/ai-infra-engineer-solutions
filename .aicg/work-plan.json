@@ -1,0 +1,268 @@
+{
+  "audit_summary": {
+    "error_count": 0,
+    "gap_count": 54,
+    "module_count": 10,
+    "status": "pass",
+    "warning_count": 54
+  },
+  "backlog_item_count": 4,
+  "backlog_items": [
+    {
+      "actions": [
+        {
+          "path": "modules/mod-104-kubernetes",
+          "type": "create_directory"
+        },
+        {
+          "exercise_id": "exercise-02",
+          "path": "modules/mod-104-kubernetes/exercise-02-control-plane-tour/SOLUTION.md",
+          "source_exercise": "lessons/mod-104-kubernetes/exercises/exercise-02-control-plane-tour",
+          "type": "write_solution"
+        },
+        {
+          "exercise_id": "exercise-09",
+          "path": "modules/mod-104-kubernetes/exercise-09-monitoring-troubleshooting/SOLUTION.md",
+          "source_exercise": "lessons/mod-104-kubernetes/exercises/exercise-09-monitoring-troubleshooting",
+          "type": "write_solution"
+        },
+        {
+          "exercise_id": "exercise-13",
+          "path": "modules/mod-104-kubernetes/exercise-13-cluster-upgrade/SOLUTION.md",
+          "source_exercise": "lessons/mod-104-kubernetes/exercises/exercise-13-cluster-upgrade",
+          "type": "write_solution"
+        }
+      ],
+      "exercises": [
+        {
+          "exercise_id": "exercise-02",
+          "expected_solution_dir": "modules/mod-104-kubernetes/exercise-02-control-plane-tour",
+          "learning_path": "lessons/mod-104-kubernetes/exercises/exercise-02-control-plane-tour",
+          "required_artifacts": [
+            "SOLUTION.md",
+            "STEP_BY_STEP.md",
+            "README.md"
+          ],
+          "slug": "control-plane-tour",
+          "status": "module_rationale_only",
+          "title": "Exercise 02: Control Plane Tour"
+        },
+        {
+          "exercise_id": "exercise-09",
+          "expected_solution_dir": "modules/mod-104-kubernetes/exercise-09-monitoring-troubleshooting",
+          "learning_path": "lessons/mod-104-kubernetes/exercises/exercise-09-monitoring-troubleshooting",
+          "required_artifacts": [
+            "SOLUTION.md",
+            "STEP_BY_STEP.md",
+            "README.md"
+          ],
+          "slug": "monitoring-troubleshooting",
+          "status": "module_rationale_only",
+          "title": "Exercise 09: Kubernetes Monitoring and Troubleshooting Mastery"
+        },
+        {
+          "exercise_id": "exercise-13",
+          "expected_solution_dir": "modules/mod-104-kubernetes/exercise-13-cluster-upgrade",
+          "learning_path": "lessons/mod-104-kubernetes/exercises/exercise-13-cluster-upgrade",
+          "required_artifacts": [
+            "SOLUTION.md",
+            "STEP_BY_STEP.md",
+            "README.md"
+          ],
+          "slug": "cluster-upgrade",
+          "status": "module_rationale_only",
+          "title": "Exercise 13: Cluster Upgrade Procedure"
+        }
+      ],
+      "id": "depth-mod-104-kubernetes-exercises",
+      "module": "mod-104-kubernetes",
+      "priority": 1001,
+      "repo": "ai-infra-engineer-solutions",
+      "severity": "warning",
+      "source_policy": {
+        "needs_research_blocks_merge": true,
+        "official_first": true,
+        "required_default_sources": [
+          "owasp-ml-top-10",
+          "mitre-atlas",
+          "nist-ai-rmf"
+        ]
+      },
+      "status": "planned",
+      "title": "Add exercise-level depth for mod-104-kubernetes",
+      "type": "exercise_depth_followup",
+      "why": "Module-level SOLUTION.md exists; per-exercise artifacts could deepen the answer for graders comparing approaches."
+    },
+    {
+      "actions": [
+        {
+          "path": "modules/mod-105-data-pipelines",
+          "type": "create_directory"
+        },
+        {
+          "exercise_id": "exercise-01",
+          "path": "modules/mod-105-data-pipelines/exercise-01-pipeline-architecture-design/SOLUTION.md",
+          "source_exercise": "lessons/mod-105-data-pipelines/exercises/exercise-01-pipeline-architecture-design",
+          "type": "write_solution"
+        }
+      ],
+      "exercises": [
+        {
+          "exercise_id": "exercise-01",
+          "expected_solution_dir": "modules/mod-105-data-pipelines/exercise-01-pipeline-architecture-design",
+          "learning_path": "lessons/mod-105-data-pipelines/exercises/exercise-01-pipeline-architecture-design",
+          "required_artifacts": [
+            "SOLUTION.md",
+            "STEP_BY_STEP.md",
+            "README.md"
+          ],
+          "slug": "pipeline-architecture-design",
+          "status": "module_rationale_only",
+          "title": "Exercise 01: Data Pipeline Architecture Design"
+        }
+      ],
+      "id": "depth-mod-105-data-pipelines-exercises",
+      "module": "mod-105-data-pipelines",
+      "priority": 1002,
+      "repo": "ai-infra-engineer-solutions",
+      "severity": "warning",
+      "source_policy": {
+        "needs_research_blocks_merge": true,
+        "official_first": true,
+        "required_default_sources": [
+          "owasp-ml-top-10",
+          "mitre-atlas",
+          "nist-ai-rmf"
+        ]
+      },
+      "status": "planned",
+      "title": "Add exercise-level depth for mod-105-data-pipelines",
+      "type": "exercise_depth_followup",
+      "why": "Module-level SOLUTION.md exists; per-exercise artifacts could deepen the answer for graders comparing approaches."
+    },
+    {
+      "actions": [
+        {
+          "path": "modules/mod-106-mlops",
+          "type": "create_directory"
+        },
+        {
+          "exercise_id": "exercise-01",
+          "path": "modules/mod-106-mlops/exercise-01-mlops-maturity-assessment/SOLUTION.md",
+          "source_exercise": "lessons/mod-106-mlops/exercises/exercise-01-mlops-maturity-assessment",
+          "type": "write_solution"
+        },
+        {
+          "exercise_id": "exercise-14",
+          "path": "modules/mod-106-mlops/exercise-14-ml-platform-operating-model/SOLUTION.md",
+          "source_exercise": "lessons/mod-106-mlops/exercises/exercise-14-ml-platform-operating-model",
+          "type": "write_solution"
+        }
+      ],
+      "exercises": [
+        {
+          "exercise_id": "exercise-01",
+          "expected_solution_dir": "modules/mod-106-mlops/exercise-01-mlops-maturity-assessment",
+          "learning_path": "lessons/mod-106-mlops/exercises/exercise-01-mlops-maturity-assessment",
+          "required_artifacts": [
+            "SOLUTION.md",
+            "STEP_BY_STEP.md",
+            "README.md"
+          ],
+          "slug": "mlops-maturity-assessment",
+          "status": "module_rationale_only",
+          "title": "Exercise 01: MLOps Maturity Assessment"
+        },
+        {
+          "exercise_id": "exercise-14",
+          "expected_solution_dir": "modules/mod-106-mlops/exercise-14-ml-platform-operating-model",
+          "learning_path": "lessons/mod-106-mlops/exercises/exercise-14-ml-platform-operating-model",
+          "required_artifacts": [
+            "SOLUTION.md",
+            "STEP_BY_STEP.md",
+            "README.md"
+          ],
+          "slug": "ml-platform-operating-model",
+          "status": "module_rationale_only",
+          "title": "Exercise 14: ML Platform Team Operating Model"
+        }
+      ],
+      "id": "depth-mod-106-mlops-exercises",
+      "module": "mod-106-mlops",
+      "priority": 1003,
+      "repo": "ai-infra-engineer-solutions",
+      "severity": "warning",
+      "source_policy": {
+        "needs_research_blocks_merge": true,
+        "official_first": true,
+        "required_default_sources": [
+          "owasp-ml-top-10",
+          "mitre-atlas",
+          "nist-ai-rmf"
+        ]
+      },
+      "status": "planned",
+      "title": "Add exercise-level depth for mod-106-mlops",
+      "type": "exercise_depth_followup",
+      "why": "Module-level SOLUTION.md exists; per-exercise artifacts could deepen the answer for graders comparing approaches."
+    },
+    {
+      "actions": [
+        {
+          "path": "modules/mod-109-infrastructure-as-code",
+          "type": "create_directory"
+        },
+        {
+          "exercise_id": "exercise-04",
+          "path": "modules/mod-109-infrastructure-as-code/exercise-04-state-management-at-scale/SOLUTION.md",
+          "source_exercise": "lessons/mod-109-infrastructure-as-code/exercises/exercise-04-state-management-at-scale",
+          "type": "write_solution"
+        }
+      ],
+      "exercises": [
+        {
+          "exercise_id": "exercise-04",
+          "expected_solution_dir": "modules/mod-109-infrastructure-as-code/exercise-04-state-management-at-scale",
+          "learning_path": "lessons/mod-109-infrastructure-as-code/exercises/exercise-04-state-management-at-scale",
+          "required_artifacts": [
+            "SOLUTION.md",
+            "STEP_BY_STEP.md",
+            "README.md"
+          ],
+          "slug": "state-management-at-scale",
+          "status": "module_rationale_only",
+          "title": "Exercise 04: Terraform State Management at Scale"
+        }
+      ],
+      "id": "depth-mod-109-infrastructure-as-code-exercises",
+      "module": "mod-109-infrastructure-as-code",
+      "priority": 1004,
+      "repo": "ai-infra-engineer-solutions",
+      "severity": "warning",
+      "source_policy": {
+        "needs_research_blocks_merge": true,
+        "official_first": true,
+        "required_default_sources": [
+          "owasp-ml-top-10",
+          "mitre-atlas",
+          "nist-ai-rmf"
+        ]
+      },
+      "status": "planned",
+      "title": "Add exercise-level depth for mod-109-infrastructure-as-code",
+      "type": "exercise_depth_followup",
+      "why": "Module-level SOLUTION.md exists; per-exercise artifacts could deepen the answer for graders comparing approaches."
+    }
+  ],
+  "generated_at": "2026-05-27T19:43:23Z",
+  "repo": {
+    "has_git": true,
+    "kind": "solutions",
+    "name": "ai-infra-engineer-solutions",
+    "path": "/Users/s0v3r1gn/ai-infra-curriculum/ai-infra-engineer-solutions",
+    "track": "engineer"
+  },
+  "schema_version": 2,
+  "work_item_count": 0,
+  "work_items": []
+}

@@ -138,3 +138,6 @@ outputs/
 artifacts/
 .neptune/
 .mlflow/
+
+# AICG (ai-infra-content-generator) runner state — never commit, see ai-infra-content-generator/docs/RUNBOOK.md
+.aicg/

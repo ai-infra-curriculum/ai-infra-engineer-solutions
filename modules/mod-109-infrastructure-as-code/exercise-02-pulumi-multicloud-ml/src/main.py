@@ -1,113 +1,108 @@
 """
-Pulumi Multi-Cloud ML Infrastructure - Main Entry Point
+Multi-Cloud ML Infrastructure (Pulumi-style) — CLI
 
-Multi-cloud ML infrastructure with Pulumi
-
-Usage:
-    python -m src.main [options]
-
-Example:
-    python -m src.main --help
+Subcommands:
+    build       Build a stack and print the resource graph.
+    diff        Diff two stack variants (e.g., with vs without TPU).
+    cost        Estimate monthly cost.
+    json        Emit the full stack as Pulumi-shaped JSON.
 """
 
+from __future__ import annotations
+
+import json
 import logging
 import sys
-from pathlib import Path
 from typing import Optional
+
 import click
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('app.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
+from .infrastructure import (
+    MultiCloudMLPlatform,
+    diff_stacks,
+    estimate_cost,
 )
 
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
+)
 logger = logging.getLogger(__name__)
 
 
-@click.group()
-@click.option('--verbose', '-v', is_flag=True, help='Enable verbose logging')
-def cli(verbose: bool):
-    """
-    Pulumi Multi-Cloud ML Infrastructure
+def _project_options(f):
+    f = click.option("--stack", default="dev")(f)
+    f = click.option("--project", default="ml-platform")(f)
+    return f
 
-    Multi-cloud ML infrastructure with Pulumi
-    """
+
+@click.group()
+@click.option("--verbose", "-v", is_flag=True)
+def cli(verbose: bool) -> None:
+    """Multi-cloud ML infrastructure (Pulumi-style)."""
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-        logger.debug("Verbose logging enabled")
 
 
 @cli.command()
-@click.option('--config', '-c', type=click.Path(exists=True), help='Configuration file')
-def run(config: Optional[str]):
-    """Run the main application"""
-    logger.info("Starting application...")
-
-    try:
-        # Main application logic goes here
-        logger.info("Application started successfully")
-
-        # TODO: Implement main functionality
-
-    except Exception as e:
-        logger.error(f"Application error: {e}", exc_info=True)
-        sys.exit(1)
+@_project_options
+@click.option("--include-tpu/--no-tpu", default=True)
+def build(project: str, stack: str, include_tpu: bool) -> None:
+    """Build a stack and summarize the resource graph."""
+    platform = MultiCloudMLPlatform(project_name=project, stack_name=stack)
+    s = platform.build(include_tpu=include_tpu)
+    click.echo(f"Stack: {s.name}  resources={len(s.resources)}  outputs={len(s.outputs)}")
+    by_provider = {}
+    for r in s.resources:
+        by_provider.setdefault(r.id.provider.value, []).append(r)
+    for provider, resources in sorted(by_provider.items()):
+        click.echo(f"\n  {provider.upper()}:")
+        for r in resources:
+            click.echo(f"    {r.id.resource_type:<40s} {r.id.logical_name}")
 
 
 @cli.command()
-def validate():
-    """Validate configuration and connectivity"""
-    logger.info("Running validation checks...")
-
-    checks = [
-        ("Configuration", check_config),
-        ("Dependencies", check_dependencies),
-        ("Connectivity", check_connectivity)
-    ]
-
-    failed = []
-    for name, check_func in checks:
-        try:
-            logger.info(f"Checking {name}...")
-            check_func()
-            logger.info(f"✓ {name} check passed")
-        except Exception as e:
-            logger.error(f"✗ {name} check failed: {e}")
-            failed.append(name)
-
-    if failed:
-        logger.error(f"Validation failed for: {', '.join(failed)}")
-        sys.exit(1)
-    else:
-        logger.info("✓ All validation checks passed")
+@_project_options
+def diff(project: str, stack: str) -> None:
+    """Diff stack with TPU vs without TPU to demonstrate change detection."""
+    platform = MultiCloudMLPlatform(project_name=project, stack_name=stack)
+    previous = platform.build(include_tpu=True)
+    current = platform.build(include_tpu=False)
+    delta = diff_stacks(previous, current)
+    click.echo(f"Changes between TPU-enabled and TPU-disabled:")
+    click.echo(f"  to create:  {len(delta.to_create)}")
+    click.echo(f"  to update:  {len(delta.to_update)}")
+    click.echo(f"  to delete:  {len(delta.to_delete)}")
+    for d in delta.diffs:
+        click.echo(f"  {d.operation:<7s} {d.urn}")
 
 
-def check_config():
-    """Check if configuration is valid"""
-    # TODO: Implement configuration validation
-    pass
+@cli.command()
+@_project_options
+def cost(project: str, stack: str) -> None:
+    """Estimate monthly cost for the stack."""
+    platform = MultiCloudMLPlatform(project_name=project, stack_name=stack)
+    s = platform.build()
+    breakdown = estimate_cost(s)
+    click.echo(f"Monthly cost for {project} ({stack}):")
+    click.echo(f"  AWS compute (EKS): ${breakdown.aws_compute_usd:>9,.2f}")
+    click.echo(f"  AWS storage (S3):  ${breakdown.aws_storage_usd:>9,.2f}")
+    click.echo(f"  GCP TPU:           ${breakdown.gcp_tpu_usd:>9,.2f}")
+    click.echo(f"  Azure Monitor:     ${breakdown.azure_monitor_usd:>9,.2f}")
+    click.echo(f"  ---------------------------")
+    click.echo(f"  Total:             ${breakdown.total_usd:>9,.2f}")
 
 
-def check_dependencies():
-    """Check if all dependencies are available"""
-    # TODO: Implement dependency checks
-    pass
+@cli.command(name="json")
+@_project_options
+def emit_json(project: str, stack: str) -> None:
+    """Emit the stack as Pulumi-shaped JSON."""
+    platform = MultiCloudMLPlatform(project_name=project, stack_name=stack)
+    s = platform.build()
+    click.echo(json.dumps(s.to_dict(), indent=2, default=str))
 
 
-def check_connectivity():
-    """Check connectivity to required services"""
-    # TODO: Implement connectivity checks
-    pass
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()

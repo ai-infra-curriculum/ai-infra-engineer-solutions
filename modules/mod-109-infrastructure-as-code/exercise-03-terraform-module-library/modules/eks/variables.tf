@@ -1,8 +1,20 @@
-variable "name"                   { type = string }
-variable "k8s_version"            { type = string, default = "1.30" }
-variable "subnet_ids"             { type = list(string) }
-variable "endpoint_public_access" { type = bool, default = false }
-variable "tags"                   { type = map(string), default = {} }
+variable "name"       { type = string }
+variable "subnet_ids" { type = list(string) }
+
+variable "k8s_version" {
+  type    = string
+  default = "1.30"
+}
+
+variable "endpoint_public_access" {
+  type    = bool
+  default = false
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
+}
 
 variable "node_groups" {
   type = map(object({

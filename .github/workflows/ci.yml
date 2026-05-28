@@ -93,6 +93,13 @@ jobs:
         uses: azure/setup-kubectl@v4
         with:
           version: v1.29.0
+      # `kubectl apply --dry-run=client` still needs to reach an API server for
+      # discovery (to map each manifest's kind to a REST resource). A throwaway
+      # kind cluster supplies that so the offline gate can resolve built-in types.
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+        with:
+          wait: 120s
       - name: Validate every Kubernetes manifest
         shell: bash
         run: |
@@ -200,6 +207,14 @@ jobs:
           fi
           fails=0
           for df in "${dockerfiles[@]}"; do
+            # Skip templated Dockerfiles (e.g. *.j2): they contain placeholder
+            # syntax meant to be rendered before building, not built directly.
+            case "$df" in
+              *.j2|*.jinja|*.jinja2|*.tmpl|*.template)
+                echo "Skipping Dockerfile template (rendered before build): $df"
+                continue
+                ;;
+            esac
             ctx="$(dirname "$df")"
             echo "=== docker build: $df ==="
             if ! docker buildx build \

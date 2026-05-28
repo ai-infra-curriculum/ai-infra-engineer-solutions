@@ -1,6 +1,70 @@
-# Configuration for operator
-# TODO: Add configuration options
-
-# Example configuration:
-# setting1: value1
-# setting2: value2
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: training-operator
+  namespace: ml-operators
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: training-operator
+rules:
+  - apiGroups: ["ml.example.com"]
+    resources: ["trainingjobs", "trainingjobs/status"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods", "events"]
+    verbs: ["get", "list", "watch", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: training-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: training-operator
+subjects:
+  - kind: ServiceAccount
+    name: training-operator
+    namespace: ml-operators
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: training-operator
+  namespace: ml-operators
+  labels:
+    app: training-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: training-operator
+  template:
+    metadata:
+      labels:
+        app: training-operator
+    spec:
+      serviceAccountName: training-operator
+      containers:
+        - name: operator
+          image: ghcr.io/example/training-operator:latest
+          args:
+            - --leader-elect
+          env:
+            - name: WATCH_NAMESPACE
+              value: ""
+          ports:
+            - name: metrics
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

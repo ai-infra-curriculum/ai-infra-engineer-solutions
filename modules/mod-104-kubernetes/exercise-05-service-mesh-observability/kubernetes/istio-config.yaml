@@ -1,6 +1,40 @@
-# Configuration for istio-config
-# TODO: Add configuration options
-
-# Example configuration:
-# setting1: value1
-# setting2: value2
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mesh-apps
+  labels:
+    istio-injection: enabled
+---
+# Mesh-wide Istio observability settings, delivered via the istiod ConfigMap.
+# Enables access logging, 100% trace sampling, and Prometheus/Zipkin providers.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: istio
+  namespace: istio-system
+  labels:
+    app: istiod
+    release: istio
+data:
+  mesh: |
+    accessLogFile: /dev/stdout
+    accessLogEncoding: JSON
+    enableTracing: true
+    defaultConfig:
+      tracing:
+        sampling: 100.0
+        zipkin:
+          address: zipkin.istio-system.svc.cluster.local:9411
+    defaultProviders:
+      metrics:
+        - prometheus
+      tracing:
+        - zipkin
+    extensionProviders:
+      - name: prometheus
+        prometheus: {}
+      - name: zipkin
+        zipkin:
+          service: zipkin.istio-system.svc.cluster.local
+          port: 9411
+  meshNetworks: 'networks: {}'

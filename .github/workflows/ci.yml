@@ -116,6 +116,16 @@ jobs:
                   continue
                   ;;
               esac
+              # kubectl --dry-run=client resolves only built-in types and CRD
+              # definitions; it cannot map *custom resources* whose CRDs are not
+              # installed in a reachable cluster. Skip third-party (vendor) CRD
+              # manifests -- a dotted API group that is not a *.k8s.io group --
+              # so this offline gate does not false-fail on them.
+              if grep -Eq '^[[:space:]]*apiVersion:[[:space:]]*[A-Za-z0-9.-]+\.[A-Za-z0-9.-]+/' "$f" \
+                 && ! grep -Eq '^[[:space:]]*apiVersion:[[:space:]]*[A-Za-z0-9.-]+\.k8s\.io/' "$f"; then
+                echo "Skipping third-party CRD manifest (CRD not installable offline): $f"
+                continue
+              fi
               files+=("$f")
             done
           done

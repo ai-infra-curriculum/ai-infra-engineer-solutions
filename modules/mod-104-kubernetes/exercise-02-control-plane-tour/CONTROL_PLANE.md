@@ -29,7 +29,7 @@ kubectl              kube-apiserver           etcd            kube-scheduler    
 | Component | Command | What I observed |
 |---|---|---|
 | kube-apiserver | `kubectl logs -n kube-system kube-apiserver-<node>` | every `kubectl` request logged with verb + resource + duration |
-| etcd | `kubectl exec -n kube-system etcd-<node> -- etcdctl get / --prefix --keys-only | head` | flat keyspace `/registry/...`; data is the API objects |
+| etcd | `kubectl exec -n kube-system etcd-<node> -- etcdctl get / --prefix --keys-only \| head` | flat keyspace `/registry/...`; data is the API objects |
 | scheduler | `kubectl logs -n kube-system kube-scheduler-<node>` | per-pod scoring: filter (which nodes can run it) → score → bind |
 | controller-manager | `kubectl logs -n kube-system kube-controller-manager-<node>` | each controller is a reconcile loop: list → diff → act |
 | kubelet | `journalctl -u kubelet` (on host) | pulls images, creates containers, posts status |

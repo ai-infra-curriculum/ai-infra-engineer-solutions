@@ -48,12 +48,12 @@ resource "aws_eks_node_group" "node" {
     max_size     = each.value.max_size
   }
   labels = each.value.labels
-  taints {
+  dynamic "taint" {
     for_each = each.value.taints
     content {
-      key    = taints.value.key
-      value  = taints.value.value
-      effect = taints.value.effect
+      key    = taint.value.key
+      value  = taint.value.value
+      effect = taint.value.effect
     }
   }
   tags = var.tags

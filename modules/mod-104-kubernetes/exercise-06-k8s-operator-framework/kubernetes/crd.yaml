@@ -1,6 +1,54 @@
-# Configuration for crd
-# TODO: Add configuration options
-
-# Example configuration:
-# setting1: value1
-# setting2: value2
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: trainingjobs.ml.example.com
+spec:
+  group: ml.example.com
+  scope: Namespaced
+  names:
+    plural: trainingjobs
+    singular: trainingjob
+    kind: TrainingJob
+    shortNames:
+      - tj
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - image
+                - replicas
+              properties:
+                image:
+                  type: string
+                replicas:
+                  type: integer
+                  minimum: 1
+                framework:
+                  type: string
+                  enum: ["pytorch", "tensorflow", "jax"]
+                gpusPerReplica:
+                  type: integer
+                  minimum: 0
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                activeWorkers:
+                  type: integer
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Replicas
+          type: integer
+          jsonPath: .spec.replicas

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: llm-api-gateway
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: llm-api-gateway
@@ -17,18 +17,41 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: ghcr.io/example/llm-api-gateway:0.1.0
+          image: ghcr.io/example/llm-api-gateway:1.0.0
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
           env:
             - name: LLAMA2_BACKEND
-              value: http://llama2:8000
+              value: http://llama2.llm-serving.svc.cluster.local:8000
             - name: MISTRAL_BACKEND
-              value: http://mistral:8000
+              value: http://mistral.llm-serving.svc.cluster.local:8000
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
           resources:
             requests:
               cpu: 250m
               memory: 256Mi
             limits:
-              cpu: 500m
+              cpu: "1"
               memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-api-gateway
+  namespace: llm-serving
+  labels:
+    app: llm-api-gateway
+spec:
+  type: ClusterIP
+  selector:
+    app: llm-api-gateway
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080

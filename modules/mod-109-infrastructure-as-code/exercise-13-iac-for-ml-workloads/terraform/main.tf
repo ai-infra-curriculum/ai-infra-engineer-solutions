@@ -7,14 +7,17 @@ terraform {
 
 provider "aws" { region = var.region }
 
+# In production these point at a published, version-pinned module registry, e.g.
+#   source = "git::https://github.com/me/tf-modules.git//modules/vpc?ref=modules/vpc/v1.2.0"
+# Local stand-in modules are vendored under ./modules so the stack validates offline.
 module "vpc" {
-  source = "../../exercise-03-terraform-module-library/modules/vpc"
+  source = "./modules/vpc"
   name   = "ml-platform-${var.environment}"
   tags   = local.common_tags
 }
 
 module "eks" {
-  source      = "../../exercise-03-terraform-module-library/modules/eks"
+  source      = "./modules/eks"
   name        = "ml-platform-${var.environment}"
   subnet_ids  = module.vpc.private_subnets
   k8s_version = "1.30"

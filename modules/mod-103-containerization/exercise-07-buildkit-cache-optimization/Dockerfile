@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.10
+# syntax=docker/dockerfile:1
 # Cache-optimized PyTorch image build.
 # Reference: https://github.com/ai-infra-curriculum/ai-infra-engineer-learning/blob/main/lessons/mod-103-containerization/exercises/exercise-07-buildkit-cache-optimization/README.md
 
@@ -11,9 +11,9 @@ COPY requirements.txt .
 RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
     pip install --user -r requirements.txt
 
-# Cache mount for HuggingFace + torch weights. Cache mounts are ephemeral and
-# are NOT committed to the image layer, so materialize the warmed weights into a
-# regular directory that the runtime stage can COPY.
+# Cache mount for HuggingFace + torch weights. The cache mount survives across
+# builds but is not part of the layer, so copy the warmed weights into a normal
+# path that the runtime stage can pull from.
 COPY warmup_cache.py .
 RUN --mount=type=cache,target=/root/.cache/huggingface,sharing=locked \
     --mount=type=cache,target=/root/.cache/torch,sharing=locked \

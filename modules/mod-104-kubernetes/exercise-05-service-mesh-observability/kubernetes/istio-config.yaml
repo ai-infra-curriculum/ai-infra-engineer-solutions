@@ -1,48 +1,40 @@
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: iris-gateway
-  namespace: iris
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-    - port:
-        number: 80
-        name: http
-        protocol: HTTP
-      hosts:
-        - "iris.example.com"
+  name: mesh-apps
+  labels:
+    istio-injection: enabled
 ---
-apiVersion: networking.istio.io/v1beta1
-kind: VirtualService
+# Mesh-wide Istio observability settings, delivered via the istiod ConfigMap.
+# Enables access logging, 100% trace sampling, and Prometheus/Zipkin providers.
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: iris-api
-  namespace: iris
-spec:
-  hosts:
-    - "iris.example.com"
-  gateways:
-    - iris-gateway
-  http:
-    - route:
-        - destination:
-            host: iris-api
-            port:
-              number: 8000
----
-apiVersion: networking.istio.io/v1beta1
-kind: DestinationRule
-metadata:
-  name: iris-api
-  namespace: iris
-spec:
-  host: iris-api
-  trafficPolicy:
-    connectionPool:
-      http:
-        http2MaxRequests: 100
-    outlierDetection:
-      consecutive5xxErrors: 5
-      interval: 30s
-      baseEjectionTime: 30s
+  name: istio
+  namespace: istio-system
+  labels:
+    app: istiod
+    release: istio
+data:
+  mesh: |
+    accessLogFile: /dev/stdout
+    accessLogEncoding: JSON
+    enableTracing: true
+    defaultConfig:
+      tracing:
+        sampling: 100.0
+        zipkin:
+          address: zipkin.istio-system.svc.cluster.local:9411
+    defaultProviders:
+      metrics:
+        - prometheus
+      tracing:
+        - zipkin
+    extensionProviders:
+      - name: prometheus
+        prometheus: {}
+      - name: zipkin
+        zipkin:
+          service: zipkin.istio-system.svc.cluster.local
+          port: 9411
+  meshNetworks: 'networks: {}'

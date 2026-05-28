@@ -1,16 +1,16 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: irismodels.ml.example.com
+  name: trainingjobs.ml.example.com
 spec:
   group: ml.example.com
   scope: Namespaced
   names:
-    plural: irismodels
-    singular: irismodel
-    kind: IrisModel
+    plural: trainingjobs
+    singular: trainingjob
+    kind: TrainingJob
     shortNames:
-      - irm
+      - tj
   versions:
     - name: v1alpha1
       served: true
@@ -21,18 +21,34 @@ spec:
           properties:
             spec:
               type: object
+              required:
+                - image
+                - replicas
               properties:
-                modelURI:
+                image:
                   type: string
                 replicas:
                   type: integer
                   minimum: 1
-              required:
-                - modelURI
+                framework:
+                  type: string
+                  enum: ["pytorch", "tensorflow", "jax"]
+                gpusPerReplica:
+                  type: integer
+                  minimum: 0
             status:
               type: object
               properties:
                 phase:
                   type: string
+                activeWorkers:
+                  type: integer
       subresources:
         status: {}
+      additionalPrinterColumns:
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Replicas
+          type: integer
+          jsonPath: .spec.replicas

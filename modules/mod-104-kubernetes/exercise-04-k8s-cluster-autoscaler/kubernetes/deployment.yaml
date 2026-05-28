@@ -21,15 +21,20 @@ spec:
           image: registry.k8s.io/autoscaling/cluster-autoscaler:v1.29.0
           command:
             - ./cluster-autoscaler
+            - --v=4
             - --cloud-provider=aws
             - --namespace=kube-system
             - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled
             - --balance-similar-node-groups
             - --scale-down-utilization-threshold=0.5
+            - --scale-down-unneeded-time=10m
+          ports:
+            - name: metrics
+              containerPort: 8085
           resources:
             requests:
               cpu: 100m
               memory: 300Mi
             limits:
-              cpu: 100m
-              memory: 300Mi
+              cpu: 200m
+              memory: 600Mi

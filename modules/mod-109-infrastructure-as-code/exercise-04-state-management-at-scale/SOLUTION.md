@@ -1,85 +1,69 @@
 # SOLUTION — Exercise 04: Terraform State Management at Scale
 
-> Read this after you have a working Terraform module and at least two
-> environments to think about. The exercise is a *layout and operations*
-> problem: design a state strategy that survives 50+ projects, 4
-> environments, and a corrupted state file at 2 a.m. The worked strategy
-> and the bootstrap stack ship alongside this file in
-> [`STRATEGY.md`](./STRATEGY.md) and [`bootstrap/main.tf`](./bootstrap/main.tf).
+> Per-exercise solution for
+> [learning exercise-04](https://github.com/ai-infra-curriculum/ai-infra-engineer-learning/blob/main/lessons/mod-109-infrastructure-as-code/exercises/exercise-04-state-management-at-scale/README.md).
+> This factors the relevant pieces of the
+> [module-level SOLUTION.md](../SOLUTION.md) (state-split rationale)
+> together with the worked layout in
+> [`STRATEGY.md`](./STRATEGY.md) and the bootstrap Terraform under
+> [`bootstrap/`](./bootstrap/). Read it *after* attempting your own
+> design.
 
 ## 1. Solution overview
 
-Exercise 04 asks you to design a Terraform state strategy that scales to
-roughly 50 projects × 4 environments without the failure modes that catch
-small teams the first time a second engineer joins. A passing submission
-demonstrates four properties:
+This exercise is a **state-architecture design + bootstrap
+implementation**: lay out remote state for a fleet of Terraform
+projects (≈50 projects × 4 environments) so that runs are locked,
+state is recoverable, and the IAM blast radius of any single apply
+is bounded.
 
-1. **Remote state with locking, from the first commit** — S3 (or
-   equivalent) for storage, DynamoDB (or equivalent) for the lock; never
-   a local `terraform.tfstate` for anything shared.
-2. **State split per blast-radius unit** — networking, k8s, data, and
-   service layers each have their own state file, and environments are
-   separated above that. A `terraform apply` to the "service" layer must
-   not be able to touch the network layer.
-3. **A bootstrap stack that creates the backend** — the S3 bucket,
-   DynamoDB lock table, and KMS key for state encryption are themselves
-   provisioned by Terraform (with a *local* backend), since the rest of
-   the estate depends on them existing.
-4. **A documented corruption-recovery and migration path** — S3 object
-   versioning is the durable backup; `terraform state mv` is the
-   migration tool; both are written down before they are needed.
+The reference answer is **one state file per (project,
+environment)** stored under prefix-based separation in a single
+S3 bucket, with DynamoDB locking and KMS-encrypted state. The full
+prefix layout, locking table, backend stanza, workspace policy,
+corruption-recovery runbook, and state-migration recipe are in
+[`STRATEGY.md`](./STRATEGY.md). The bootstrap stack that creates
+the bucket and lock table — the only stack allowed to use a
+`local` backend — is in [`bootstrap/main.tf`](./bootstrap/main.tf).
 
-This factors the module-level rationale (see
-[`../SOLUTION.md`](../SOLUTION.md), Decisions 1 and 3, plus the
-"one backend per environment, not one backend per state file" trade-off)
-into the concrete artifacts the exercise asks you to produce.
+This document explains *why* the layout is shaped that way, ties
+each piece to the module-level architectural decisions, and gives
+graders a rubric.
 
-## 2. Implementation
+## 2. Worked answer or implementation
 
-This is the worked answer — the model state layout, the bootstrap
-stack, the per-project `backend.tf`, and the recovery procedures that
-together constitute the implementation a passing submission must
-reproduce.
+The complete worked layout lives in [`STRATEGY.md`](./STRATEGY.md);
+the runnable bootstrap is in [`bootstrap/`](./bootstrap/). The
+summary below ties each component to the architectural decision
+that motivates it (decisions are drawn from the
+[module-level SOLUTION.md](../SOLUTION.md)).
 
-### Layout: one backend, prefix-per-(env, project)
+### Prefix-based layout: `<env>/<project>/terraform.tfstate`
 
-The S3 key layout in [`STRATEGY.md`](./STRATEGY.md) is the model:
-
-```
+```text
 s3://company-tf-state/
-  prod/{network,eks,rds,...}/terraform.tfstate
+  prod/{network,eks,rds}/terraform.tfstate
   staging/{network,eks,...}/terraform.tfstate
-  dev/{...}/terraform.tfstate
+  dev/...
 ```
 
-One bucket per organization; prefix separation per environment and per
-project. The IAM boundary lives at the prefix, not the bucket: production
-state is readable only by production-deploy roles, etc. This is the
-trade-off called out in [`../SOLUTION.md`](../SOLUTION.md) — bucket
-creation requires elevated permissions, prefixes are cheap.
+50 projects × 4 environments = 200 state files in a single bucket.
+Cross-project reads go through explicit
+`data.terraform_remote_state`; there is no implicit sharing.
 
-50 projects × 4 environments = ~200 state files. Cross-stack reads use
-explicit `data "terraform_remote_state"`; circular reads are forbidden.
+**Decision 3 — state split per environment + per service.** An
+apply to the service layer must not have permission to touch the
+networking layer; the state split is the boundary that enforces
+that, and IAM policies attach to the prefix.
 
-### Bootstrap stack ([`bootstrap/main.tf`](./bootstrap/main.tf))
-
-The chicken-and-egg problem: you cannot use an S3 backend before the S3
-bucket exists. The bootstrap stack is the one place a *local* backend is
-acceptable, and it provisions:
-
-- the state bucket, with versioning enabled and all public access
-  blocked,
-- a KMS key (with rotation) for server-side encryption of state objects,
-- the `terraform-locks` DynamoDB table (pay-per-request, `LockID`
-  partition key).
-
-Bucket versioning is the durable backup for state corruption recovery;
-deletion protection and MFA-delete should be added on top for prod.
+**Trade-off — one bucket, many prefixes (not one bucket per
+state).** Bucket creation requires elevated permissions; prefix
+separation is a string change. The module-level rationale calls
+this out explicitly: the IAM boundary is at the prefix.
 
 ### Per-project `backend.tf`
 
-Every other project under the org points at the bucket and lock table
-with the matching prefix:
+Each project pins its own key under the shared bucket:
 
 ```hcl
 terraform {
@@ -94,163 +78,213 @@ terraform {
 }
 ```
 
-The `key` is the only thing that changes between projects/environments;
-everything else is identical across the estate. This makes per-project
-`backend.tf` files trivially DRY (or trivially templatable with
-Terragrunt, if the team adopts it later — see
-[`../SOLUTION.md`](../SOLUTION.md), "When to go beyond this
-implementation").
+**Decision 1 — remote state with locking from the first commit.**
+Local state files desync the first time a second engineer joins;
+the S3 backend + DynamoDB lock prevents that class of failure
+entirely.
 
-### Workspace policy
+### DynamoDB lock table
 
-Workspaces are used **only** for per-developer ephemeral test stacks.
-Long-lived environments (prod / staging / dev) each have their own state
-file — never a workspace inside a shared state. Conflating
-workspaces with environments is one of the failure modes this layout
-exists to avoid.
+One table, `terraform-locks`, partition key `LockID`, TTL on
+`Expiration` (~15 min) so a crashed client releases its lock
+without manual intervention. Provisioned in the bootstrap stack
+under [`bootstrap/main.tf`](./bootstrap/main.tf) with
+`billing_mode = "PAY_PER_REQUEST"` so it costs effectively nothing
+at idle.
 
-### State corruption recovery (runbook shape)
+### Bucket hardening (in bootstrap)
 
-When state is corrupted or accidentally truncated:
+The bootstrap stack creates the state bucket with:
 
-1. **Freeze the world** — pause CI and tell the team to stop running
-   `terraform`. Concurrent applies are how a single bad state becomes
-   two.
+- **Versioning** enabled — every state write is a recoverable
+  object version. This is the corruption-recovery primitive.
+- **KMS encryption** at rest with a dedicated CMK
+  (`enable_key_rotation = true`,
+  `deletion_window_in_days = 30`).
+- **Public-access block** with all four flags on.
+
+For production, also enable bucket deletion protection and
+MFA-delete (per [`STRATEGY.md`](./STRATEGY.md) §Best practices —
+MFA-delete is a one-time root-credential operation and so is not
+managed by the Terraform stack itself).
+
+### Workspace policy: ephemeral only
+
+`terraform workspace` is used **only** for short-lived
+per-developer test stacks. Every long-lived environment
+(prod/staging/dev) gets its own discrete state file under its own
+prefix — not a workspace inside a shared state. Workspaces inside
+a shared state file are the most common way teams accidentally
+re-couple environments they tried to separate.
+
+### State-corruption recovery (runbook)
+
+When state is corrupted or accidentally truncated, the documented
+sequence is:
+
+1. **Stop everything** — pause CI; tell the team to stop running
+   `terraform`.
 2. **Restore from S3 versioning** —
-   `aws s3api list-object-versions --bucket company-tf-state --prefix <key>`
-   to find the last-good version, then `aws s3api copy-object` (or
-   `get-object` + re-`put`) to promote it back to the current version.
-3. **Validate** — `terraform plan` should show no unexpected changes.
-   If it does, the wrong version was restored.
-4. **Resume** — re-enable CI, post an incident note.
+   `aws s3api list-object-versions ...`, pick the last-known-good
+   version, restore it as the current object.
+3. **Validate** — `terraform plan` shows no unexpected changes
+   before resuming.
+4. **Resume** — re-enable CI, post the incident note.
 
-### State migration
+Versioning + KMS is the *only* backup. State files are never
+committed to Git.
 
-When moving resources between modules (a refactor, not a re-create):
+### State migration between modules
+
+When moving resources between modules (e.g. extracting a sub-
+module), the pattern is:
 
 ```bash
-terraform state list                         # confirm the source address
-terraform state mv module.old_vpc module.vpc # do the move
-terraform plan                                # expect no changes
+terraform state list                       # inspect first
+terraform state mv module.old_vpc module.vpc
 ```
 
-Tag a backup version of the state object in S3 before running
-`state mv`; it is the rollback if the move is wrong. Use
-`terraform import` only when adopting an existing resource into state,
-and always follow it with a `plan` to confirm the configuration matches
-the imported resource — see common mistake 4 in
-[`../SOLUTION.md`](../SOLUTION.md).
+Always tag a backup S3 object version before the `mv` so a
+rollback is one `aws s3api copy-object` away.
+
+### The bootstrap chicken-and-egg
+
+The bootstrap stack is the one piece of the system that *cannot*
+live in the S3 backend it is creating, so it uses
+`backend "local"` (see line 7 of
+[`bootstrap/main.tf`](./bootstrap/main.tf)). Its `terraform.tfstate`
+is checked into a tightly-scoped admin repository, not the
+application repos. Once bootstrap has run, every other project
+uses the S3 backend.
 
 ## 3. Validation steps
 
-These verify the bootstrap stack and a representative per-project
-backend. Run them once after first apply and then as part of any
-"is the foundation still healthy" check.
+This is a mixed design + implementation artifact. Validation
+runs in two phases.
 
-```bash
-# 1. Bootstrap apply is clean and bucket is in the expected configuration.
-cd bootstrap
-terraform init
-terraform validate
-terraform fmt -check
-terraform plan -out=tfplan
-terraform apply tfplan
+### Static validation (no AWS account required)
 
-# 2. Versioning, public-access block, and SSE are actually enabled.
-aws s3api get-bucket-versioning      --bucket company-tf-state \
-  | grep -i '"Status": "Enabled"'
-aws s3api get-public-access-block    --bucket company-tf-state \
-  | grep -iE '"(BlockPublicAcls|IgnorePublicAcls|BlockPublicPolicy|RestrictPublicBuckets)": true'
-aws s3api get-bucket-encryption      --bucket company-tf-state \
-  | grep -i '"SSEAlgorithm": "aws:kms"'
+1. **Terraform formatting and syntax** —
+   `terraform -chdir=bootstrap fmt -check`
+   and `terraform -chdir=bootstrap validate` (after
+   `terraform -chdir=bootstrap init -backend=false`). Both must
+   pass before the bootstrap is reviewable.
+2. **Markdown** — `markdownlint-cli2` passes on this file and
+   `STRATEGY.md`; see repo
+   [`.markdownlint.jsonc`](../../../.markdownlint.jsonc).
+3. **Decision trace** — for each piece of the design (prefix
+   layout, lock table, bucket hardening, workspace policy), the
+   reviewer can name which module-level decision it instantiates.
 
-# 3. Lock table exists and uses the expected partition key.
-aws dynamodb describe-table --table-name terraform-locks \
-  | grep -iE '"AttributeName": "LockID"|"BillingMode(Summary)?": "PAY_PER_REQUEST"'
+### Live validation (with an AWS account)
 
-# 4. A second concurrent apply on the same prefix is blocked by the lock.
-cd ../  # any project pointing at the prefix
-terraform init
-terraform plan &                # in one shell
-terraform plan                  # in another — expect a lock acquisition error
+1. **Apply bootstrap** —
+   `terraform -chdir=bootstrap init && terraform -chdir=bootstrap apply -var=state_bucket_name=<name>`.
+   Confirm: S3 bucket created, versioning on, public access
+   blocked, KMS CMK rotation on, DynamoDB lock table present.
+2. **Configure a downstream project** to use the S3 backend with
+   a key under a prefix and run `terraform init` followed by
+   `terraform plan`. Confirm a lock entry appears in the
+   `terraform-locks` DynamoDB table while the plan is running.
+3. **Concurrent lock test** — run a second `terraform plan` from
+   another shell against the same key while the first one is
+   holding the lock; confirm the second client blocks on the lock
+   with a clear error referencing `LockID`.
+4. **Recovery drill** — list object versions for one state file
+   (`aws s3api list-object-versions --bucket <name> --prefix <key>`);
+   confirm at least two versions exist after a second apply, and
+   that restoring the prior version brings the state back.
 
-# 5. Cross-stack reads work without coupling configuration.
-#    Consumers read producer outputs via data.terraform_remote_state.
-terraform console <<<'data.terraform_remote_state.network.outputs.vpc_id'
-```
+## 4. Rubric or review checklist
 
-A correct deployment shows: bucket versioning on, public access blocked,
-SSE-KMS in force, DynamoDB lock table reachable, concurrent applies
-serialized by the lock, and cross-stack reads returning real outputs.
+Score each dimension; a strong submission addresses all six.
+Point weights are pedagogical scaffolding for graders, not
+external metrics.
 
-## 4. Rubric / review checklist
-
-| Criterion | Weight | Pass condition |
+| Dimension | Looking for | Weight |
 |---|---|---|
-| Remote backend + locking | 20% | S3 (or equivalent) backend with a DynamoDB lock table; no local state for shared stacks |
-| Bootstrap stack present | 15% | Bucket + lock table + KMS key provisioned by Terraform with a local backend; versioning + public-access block + SSE enabled |
-| Prefix layout per (env, project) | 20% | One backend, one prefix per environment, one prefix per project; ~50×4 layout is explicitly described |
-| Workspace discipline | 10% | Workspaces used only for ephemeral dev stacks; prod/staging/dev each have their own state file |
-| Recovery runbook | 15% | Freeze → restore from S3 versioning → validate → resume; concrete commands, not vague intent |
-| Migration / import safety | 10% | `terraform state mv` and `terraform import` documented with a pre-move state backup and a follow-up `plan` |
-| Cross-stack reads | 10% | Uses `data.terraform_remote_state`; no circular reads between stacks |
+| State split & blast radius | One state file per (project, environment); cross-project access only via `data.terraform_remote_state` (Decision 3) | 20 |
+| Remote backend & locking | S3 backend wired in every project from day one; DynamoDB lock table with `LockID` partition key (Decision 1) | 20 |
+| Bucket hardening | Versioning, KMS encryption with rotation, public-access block, deletion protection, MFA-delete called out for prod | 15 |
+| Bootstrap stack | A dedicated `backend "local"` bootstrap that creates the bucket + lock table and is the *only* stack to use local state | 10 |
+| Workspace policy | Workspaces restricted to ephemeral per-dev stacks; long-lived envs each get their own discrete state file | 10 |
+| Recovery & migration runbooks | A documented corruption-recovery sequence using S3 versioning, and a `terraform state mv` migration recipe with pre-move backup | 15 |
+| Documentation discipline | `STRATEGY.md` reads as a runbook a teammate could execute solo; key names, table names, and IAM-boundary intent are explicit | 10 |
 
-Borderline cases: a submission with remote state but no bootstrap stack
-fails the "Bootstrap stack present" criterion — the chicken-and-egg
-problem is part of the exercise. A submission that uses workspaces for
-prod/staging/dev fails "Workspace discipline" regardless of how clean
-the rest is.
+Review checklist (binary):
+
+- [ ] One state file per (project, environment); no shared
+      multi-env state.
+- [ ] S3 backend wired in every project; DynamoDB lock table
+      present.
+- [ ] State bucket has versioning, KMS encryption with rotation,
+      and a public-access block.
+- [ ] Bootstrap stack uses `backend "local"` and provisions the
+      bucket + lock table.
+- [ ] Workspaces are not used for prod/staging/dev.
+- [ ] Corruption-recovery runbook present and references S3 object
+      versions.
+- [ ] State-migration recipe present and recommends backing up the
+      object version before `terraform state mv`.
+- [ ] State files are never committed to Git.
 
 ## 5. Common mistakes
 
-1. **Local state for shared stacks.** Multiple engineers + a local
-   `terraform.tfstate` = corrupted state by the end of the week. Remote
-   state with locking, from the first commit (see
-   [`../SOLUTION.md`](../SOLUTION.md), Decision 1).
-2. **One giant state file for the whole environment.** A single state
-   means a `terraform apply` to the service layer has IAM to touch
-   networking. Split per blast-radius unit (Decision 3 in
-   [`../SOLUTION.md`](../SOLUTION.md)).
-3. **State committed to git.** State files contain resource attributes
-   (and sometimes secrets). Always remote; backups are S3 object
-   versions, not Git history (common mistake 3 in
-   [`../SOLUTION.md`](../SOLUTION.md)).
-4. **Workspaces as environments.** Workspaces share a state file with
-   per-workspace key prefixes; an operator error can wipe the wrong
-   environment. Use one state file per long-lived environment, and
-   reserve workspaces for ephemeral dev stacks.
-5. **`terraform import` without a follow-up `plan`.** The resource is in
-   state but the configuration does not match; the next apply tries to
-   recreate it (common mistake 4 in [`../SOLUTION.md`](../SOLUTION.md)).
-6. **No bucket versioning.** S3 versioning is the durable backup for
-   state corruption. Without it, the recovery path is "rebuild from
-   memory."
-7. **Circular `terraform_remote_state` reads.** Stack A reads Stack B
-   reads Stack A. The apply order becomes undefined; break the cycle by
-   moving the shared resource into a third stack consumed by both.
-8. **No KMS-managed encryption on the state bucket.** State objects can
-   contain secrets; relying on default S3 encryption alone foregoes the
-   key-rotation and audit story that comes with a customer-managed key.
+Drawn from the module-level grader notes
+([SOLUTION.md](../SOLUTION.md) §"Common mistakes graders see"),
+specialized to state management:
+
+1. **State file committed to git** — state files contain secrets;
+   always use a remote backend (module mistake #3).
+2. **Shared single state for all environments** — collapses
+   Decision 3's IAM blast-radius boundary; one bad apply touches
+   every environment.
+3. **Workspaces used for prod/staging/dev** — re-couples the
+   environments the prefix layout was designed to separate.
+4. **Missing DynamoDB lock table** — two engineers run
+   `terraform apply` concurrently and the second clobbers the
+   first's state.
+5. **No bucket versioning** — there is no recovery primitive when
+   state is corrupted; the bucket's object history *is* the
+   backup.
+6. **`terraform import` with no follow-up** — the imported
+   resource lives in state but the configuration doesn't match;
+   next apply tries to recreate it (module mistake #4).
+7. **Manual changes outside Terraform** — drift accumulates
+   silently; always include `terraform plan` in incident response
+   (module mistake #5).
+8. **Bootstrap stack stored in the S3 backend it creates** — a
+   chicken-and-egg that locks teams out of recovery when the
+   bucket is gone.
 
 ## 6. References
 
-- Local exercise context: [`STRATEGY.md`](./STRATEGY.md) — the worked
-  layout, locking design, recovery runbook, and migration commands.
-- Local exercise context: [`bootstrap/main.tf`](./bootstrap/main.tf) —
-  the bootstrap stack for state bucket, KMS key, and lock table.
-- Module rationale: [`../SOLUTION.md`](../SOLUTION.md) — Decisions 1
-  (remote state + locking) and 3 (state split per environment + per
-  service), plus the "one backend per environment" trade-off.
-- Learning exercise brief: `lessons/mod-109-infrastructure-as-code/exercises/exercise-04-state-management-at-scale`
-  ([README](https://github.com/ai-infra-curriculum/ai-infra-engineer-learning/blob/main/lessons/mod-109-infrastructure-as-code/exercises/exercise-04-state-management-at-scale/README.md)).
-- Official Terraform documentation — S3 backend:
-  https://developer.hashicorp.com/terraform/language/backend/s3
-- Official Terraform documentation — State and remote state data source:
-  https://developer.hashicorp.com/terraform/language/state
-  and https://developer.hashicorp.com/terraform/language/state/remote-state-data
-- Official Terraform documentation — `terraform state mv` /
-  `terraform import`:
-  https://developer.hashicorp.com/terraform/cli/commands/state/mv
-  and https://developer.hashicorp.com/terraform/cli/commands/import
-- Official AWS documentation — S3 versioning:
-  https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html
+Local exercise context:
+
+- Learning exercise README —
+  <https://github.com/ai-infra-curriculum/ai-infra-engineer-learning/blob/main/lessons/mod-109-infrastructure-as-code/exercises/exercise-04-state-management-at-scale/README.md>
+- Module rationale — [`../SOLUTION.md`](../SOLUTION.md)
+- Reference layout & runbooks — [`./STRATEGY.md`](./STRATEGY.md)
+- Bootstrap Terraform — [`./bootstrap/main.tf`](./bootstrap/main.tf)
+
+Official project / standard documentation:
+
+- Terraform — Backends (S3 backend, locking semantics) —
+  <https://developer.hashicorp.com/terraform/language/settings/backends/s3>
+- Terraform — `terraform state` command reference —
+  <https://developer.hashicorp.com/terraform/cli/commands/state>
+- Terraform — Workspaces —
+  <https://developer.hashicorp.com/terraform/language/state/workspaces>
+- AWS S3 — Object versioning —
+  <https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html>
+- AWS S3 — Default encryption (SSE-KMS) —
+  <https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-encryption.html>
+- AWS S3 — Block public access —
+  <https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html>
+- AWS DynamoDB — TTL —
+  <https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html>
+- AWS KMS — Key rotation —
+  <https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html>
+- NIST AI Risk Management Framework (governance / configuration
+  management context for IaC change control) —
+  <https://www.nist.gov/itl/ai-risk-management-framework>

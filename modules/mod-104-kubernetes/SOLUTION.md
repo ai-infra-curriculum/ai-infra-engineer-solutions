@@ -145,6 +145,19 @@ controller fronting many services pays for itself in week one.
 - Move to **Argo CD with App-of-Apps** for cluster-bootstrap
   configuration management.
 
+## Per-exercise solution docs
+
+This file is the module-level rationale and index. Individual exercises
+break their worked answers, validation steps, and grading rubrics out into
+their own `SOLUTION.md`:
+
+- [`exercise-02-control-plane-tour/SOLUTION.md`](./exercise-02-control-plane-tour/SOLUTION.md)
+  — tracing a request through the control plane.
+- [`exercise-09-monitoring-troubleshooting/SOLUTION.md`](./exercise-09-monitoring-troubleshooting/SOLUTION.md)
+  — monitoring stack plus the five incident-diagnosis recipes.
+- [`exercise-13-cluster-upgrade/SOLUTION.md`](./exercise-13-cluster-upgrade/SOLUTION.md)
+  — safe, ordered, reversible cluster-upgrade procedure.
+
 ## Related curriculum touchpoints
 
 - ``engineer/mod-103-containerization`` — what these manifests

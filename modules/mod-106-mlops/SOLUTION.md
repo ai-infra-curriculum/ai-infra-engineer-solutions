@@ -133,6 +133,18 @@ can experiment with.
 - Move to **multi-model serving** (BentoML Yatai, KServe
   ModelMesh) when you have 50+ models in production.
 
+## Per-exercise solution docs
+
+This file is the module-level rationale and index. Individual exercises break
+their worked answers, validation steps, and grading rubrics out into their own
+`SOLUTION.md`:
+
+- [`exercise-01-mlops-maturity-assessment/SOLUTION.md`](./exercise-01-mlops-maturity-assessment/SOLUTION.md)
+  — rating a team's maturity and building a dependency-ordered roadmap.
+- [`exercise-14-ml-platform-operating-model/SOLUTION.md`](./exercise-14-ml-platform-operating-model/SOLUTION.md)
+  — the platform team charter: ownership boundaries, intake, support, and
+  on-call.
+
 ## Related curriculum touchpoints
 
 - ``engineer/mod-105-data-pipelines`` — the data side of MLOps.

@@ -1,6 +1,48 @@
-# Configuration for istio-config
-# TODO: Add configuration options
-
-# Example configuration:
-# setting1: value1
-# setting2: value2
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: iris-gateway
+  namespace: iris
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "iris.example.com"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: iris-api
+  namespace: iris
+spec:
+  hosts:
+    - "iris.example.com"
+  gateways:
+    - iris-gateway
+  http:
+    - route:
+        - destination:
+            host: iris-api
+            port:
+              number: 8000
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: iris-api
+  namespace: iris
+spec:
+  host: iris-api
+  trafficPolicy:
+    connectionPool:
+      http:
+        http2MaxRequests: 100
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s

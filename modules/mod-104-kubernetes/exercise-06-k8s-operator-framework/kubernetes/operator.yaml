@@ -1,6 +1,37 @@
-# Configuration for operator
-# TODO: Add configuration options
-
-# Example configuration:
-# setting1: value1
-# setting2: value2
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: iris-operator
+  namespace: iris-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iris-operator
+  namespace: iris-system
+  labels:
+    app: iris-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iris-operator
+  template:
+    metadata:
+      labels:
+        app: iris-operator
+    spec:
+      serviceAccountName: iris-operator
+      containers:
+        - name: operator
+          image: ghcr.io/example/iris-operator:0.1.0
+          command: ["/manager"]
+          args:
+            - --leader-elect
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

@@ -8,13 +8,13 @@ terraform {
 provider "aws" { region = var.region }
 
 module "vpc" {
-  source = "git::https://github.com/me/tf-modules.git//modules/vpc?ref=modules/vpc/v1.2.0"
+  source = "../../exercise-03-terraform-module-library/modules/vpc"
   name   = "ml-platform-${var.environment}"
   tags   = local.common_tags
 }
 
 module "eks" {
-  source      = "git::https://github.com/me/tf-modules.git//modules/eks?ref=modules/eks/v1.4.0"
+  source      = "../../exercise-03-terraform-module-library/modules/eks"
   name        = "ml-platform-${var.environment}"
   subnet_ids  = module.vpc.private_subnets
   k8s_version = "1.30"

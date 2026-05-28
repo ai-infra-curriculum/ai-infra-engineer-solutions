@@ -1,6 +1,29 @@
-# Configuration for llama2-deployment
-# TODO: Add configuration options
-
-# Example configuration:
-# setting1: value1
-# setting2: value2
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama2
+  namespace: llm-serving
+  labels:
+    app: llama2
+    model: llama2-7b
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llama2
+  template:
+    metadata:
+      labels:
+        app: llama2
+        model: llama2-7b
+    spec:
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:v0.5.0
+          args:
+            - --model=meta-llama/Llama-2-7b-chat-hf
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              nvidia.com/gpu: 1

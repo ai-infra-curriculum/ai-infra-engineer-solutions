@@ -1,6 +1,29 @@
-# Configuration for mistral-deployment
-# TODO: Add configuration options
-
-# Example configuration:
-# setting1: value1
-# setting2: value2
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mistral
+  namespace: llm-serving
+  labels:
+    app: mistral
+    model: mistral-7b
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mistral
+  template:
+    metadata:
+      labels:
+        app: mistral
+        model: mistral-7b
+    spec:
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:v0.5.0
+          args:
+            - --model=mistralai/Mistral-7B-Instruct-v0.2
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              nvidia.com/gpu: 1

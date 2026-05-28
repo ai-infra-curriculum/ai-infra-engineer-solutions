@@ -143,14 +143,24 @@ jobs:
           fi
 
           fails=0
+          skipped=0
           for f in "${files[@]}"; do
-            if ! kubectl apply --dry-run=client --validate=false -f "$f" >/dev/null 2>&1; then
-              echo "::error file=$f::kubectl dry-run rejected manifest"
-              kubectl apply --dry-run=client --validate=false -f "$f" || true
-              fails=$((fails+1))
+            err="$(kubectl apply --dry-run=client --validate=false -f "$f" 2>&1 >/dev/null)" && continue
+            # Manifests for CustomResourceDefinitions (Istio, External Secrets,
+            # Prometheus Operator, ...) can't be REST-mapped by client-side
+            # dry-run unless the CRD is installed on a reachable cluster. Skip
+            # those mapping/discovery failures, but still fail on real problems:
+            # malformed YAML, missing apiVersion/kind, empty documents, etc.
+            if printf '%s' "$err" | grep -qE 'no matches for kind|unable to recognize|ensure CRDs are installed|connection to the server|connection refused'; then
+              echo "skip (kind not resolvable client-side): $f"
+              skipped=$((skipped+1))
+              continue
             fi
+            echo "::error file=$f::kubectl dry-run rejected manifest"
+            printf '%s\n' "$err"
+            fails=$((fails+1))
           done
-          echo "Validated ${#files[@]} manifest(s); ${fails} rejection(s)."
+          echo "Validated ${#files[@]} manifest(s); ${fails} rejection(s), ${skipped} CRD skip(s)."
           exit "$fails"
 
   terraform-validate:
@@ -200,7 +210,17 @@ jobs:
         run: |
           set -uo pipefail
           shopt -s globstar nullglob
-          dockerfiles=( modules/**/Dockerfile modules/**/Dockerfile.* )
+          dockerfiles=()
+          for df in modules/**/Dockerfile modules/**/Dockerfile.*; do
+            case "$df" in
+              *.j2|*.jinja|*.jinja2|*.template|*.tmpl)
+                # Templating sources (e.g. Dockerfile.j2) are rendered by a
+                # generator before use and are not buildable as-is.
+                continue
+                ;;
+            esac
+            dockerfiles+=("$df")
+          done
           if [ ${#dockerfiles[@]} -eq 0 ]; then
             echo "No Dockerfiles found; nothing to smoke-build."
             exit 0

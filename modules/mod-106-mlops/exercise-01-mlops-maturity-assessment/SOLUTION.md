@@ -41,8 +41,8 @@ pins the team at the bottom of the scale.
 walks each capability from its manual/ad-hoc present state to a tooled target
 state (manual data validation → Great Expectations; per-notebook features →
 Feast; spreadsheet tracking → MLflow; filesystem registry → MLflow registry;
-no model CI/CD → GitHub Actions + canary; latency-only monitoring → drift + bias
-+ slice metrics; manual retrain → event/cron triggered).
+no model CI/CD → GitHub Actions + canary; latency-only monitoring →
+drift + bias + slice metrics; manual retrain → event/cron triggered).
 
 > Indexing note: the sample uses a 1-indexed scale (Level 1 = manual). Google
 > Cloud's published MLOps maturity model is 0-indexed — level 0 (manual
@@ -135,15 +135,15 @@ sequencing error the module rationale warns against.
 
 ## 6. References
 
-+ Local exercise context: [`ASSESSMENT.md`](./ASSESSMENT.md) — the worked
+- Local exercise context: [`ASSESSMENT.md`](./ASSESSMENT.md) — the worked
   sample assessment, gap table, prioritized investments, and 6-month roadmap.
-+ Module rationale: [`../SOLUTION.md`](../SOLUTION.md) (Decisions 1–2 and the
+- Module rationale: [`../SOLUTION.md`](../SOLUTION.md) (Decisions 1–2 and the
   "Common mistakes graders see" / "When to go beyond" sections).
-+ Learning exercise brief: `lessons/mod-106-mlops/exercises/exercise-01-mlops-maturity-assessment`
+- Learning exercise brief: `lessons/mod-106-mlops/exercises/exercise-01-mlops-maturity-assessment`
   ([README](https://github.com/ai-infra-curriculum/ai-infra-engineer-learning/blob/main/lessons/mod-106-mlops/exercises/exercise-01-mlops-maturity-assessment/README.md)).
-+ Google Cloud — *MLOps: Continuous delivery and automation pipelines in
+- Google Cloud — *MLOps: Continuous delivery and automation pipelines in
   machine learning* (the maturity model the sample's leveling is built on):
   https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning
-+ NIST AI Risk Management Framework — the **GOVERN** function (accountability,
+- NIST AI Risk Management Framework — the **GOVERN** function (accountability,
   roles, and process maturity) as a complementary governance lens for a maturity
   assessment: https://www.nist.gov/itl/ai-risk-management-framework

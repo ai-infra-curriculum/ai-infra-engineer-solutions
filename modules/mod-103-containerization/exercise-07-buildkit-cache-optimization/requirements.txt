@@ -1,3 +1,5 @@
-torch>=2.3 --index-url https://download.pytorch.org/whl/cpu
+# CPU-only PyTorch wheels come from the dedicated index; everything else from PyPI.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.3
 transformers>=4.42
 huggingface_hub>=0.24

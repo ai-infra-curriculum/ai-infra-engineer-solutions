@@ -363,3 +363,9 @@ This curriculum was developed as part of the AI Infrastructure Career Path proje
 **Happy Learning!** 🚀
 
 *Built with ❤️ by the AI Infrastructure Curriculum Team*
+
+
+---
+
+<!-- aicg:maintained-by -->
+Maintained by [VeriSwarm.ai](https://veriswarm.ai)

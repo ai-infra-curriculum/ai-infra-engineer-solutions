@@ -22,14 +22,15 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 ## 📚 Table of Contents
 
 1. [Module Overview](#module-overview)
-2. [Complete Exercise Catalog](#complete-exercise-catalog)
-3. [Difficulty Progression](#difficulty-progression)
-4. [Skill Matrix](#skill-matrix)
-5. [Technology Coverage](#technology-coverage)
-6. [Learning Paths](#learning-paths)
-7. [Time Estimates](#time-estimates)
-8. [Prerequisites Map](#prerequisites-map)
-9. [Career Alignment](#career-alignment)
+2. [Projects](#projects)
+3. [Complete Exercise Catalog](#complete-exercise-catalog)
+4. [Difficulty Progression](#difficulty-progression)
+5. [Skill Matrix](#skill-matrix)
+6. [Technology Coverage](#technology-coverage)
+7. [Learning Paths](#learning-paths)
+8. [Time Estimates](#time-estimates)
+9. [Prerequisites Map](#prerequisites-map)
+10. [Career Alignment](#career-alignment)
 
 ---
 
@@ -49,6 +50,14 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 | Monitoring | mod-108 | 2 | 20-26 | Observability & ML metrics |
 | Infrastructure as Code | mod-109 | 2 | 20-26 | Terraform & Pulumi |
 | LLM Infrastructure | mod-110-llm-infrastructure | 2 | 38-48 | LLM serving & RAG |
+
+---
+
+## Projects
+
+| Code | Project | Path |
+|------|---------|------|
+| project-102 | End-to-End MLOps Pipeline | [`projects/project-102-mlops-pipeline`](./projects/project-102-mlops-pipeline) |
 
 ---
 

@@ -42,7 +42,7 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 | Foundations | mod-101 | 3 | 18-24 | Advanced tooling & frameworks |
 | Cloud Computing | mod-102 | 3 | 24-30 | Multi-cloud & cost optimization |
 | Containerization | mod-103-containerization | 3 | 20-26 | Security & optimization |
-| Kubernetes | mod-104 | 3 | 26-34 | Advanced orchestration |
+| Kubernetes | mod-104-kubernetes | 3 | 26-34 | Advanced orchestration |
 | Data Pipelines | mod-105 | 2 | 22-28 | Streaming & workflow |
 | MLOps | mod-106 | 3 | 24-32 | Production ML lifecycle |
 | GPU Computing | mod-107 | 3 | 28-36 | GPU management & optimization |

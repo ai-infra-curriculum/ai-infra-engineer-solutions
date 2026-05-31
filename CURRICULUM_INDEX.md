@@ -50,6 +50,12 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 | Infrastructure as Code | mod-109 | 2 | 20-26 | Terraform & Pulumi |
 | LLM Infrastructure | mod-110-llm-infrastructure | 2 | 38-48 | LLM serving & RAG |
 
+### Projects
+
+| Code | Project | Path |
+|------|---------|------|
+| project-103 | LLM Deployment Platform | [`projects/project-103-llm-deployment`](./projects/project-103-llm-deployment) |
+
 ---
 
 ## Complete Exercise Catalog

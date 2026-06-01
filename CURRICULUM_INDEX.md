@@ -51,7 +51,13 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 | Infrastructure as Code | mod-109-infrastructure-as-code | 2 | 20-26 | Terraform & Pulumi |
 | LLM Infrastructure | mod-110-llm-infrastructure | 2 | 38-48 | LLM serving & RAG |
 
-### Projects
+#### Projects
+
+| Code | Project | Path |
+|------|---------|------|
+| project-101 | Basic Model Serving System | [`projects/project-101-basic-model-serving`](./projects/project-101-basic-model-serving) |
+
+## Projects
 
 | Code | Project | Path |
 |------|---------|------|

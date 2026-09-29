@@ -51,6 +51,12 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 | Infrastructure as Code | mod-109-infrastructure-as-code | 2 | 20-26 | Terraform & Pulumi |
 | LLM Infrastructure | mod-110-llm-infrastructure | 2 | 38-48 | LLM serving & RAG |
 
+#### Modules
+
+| Code | Module | Path |
+|------|--------|------|
+| mod-104-kubernetes | Kubernetes | [`modules/mod-104-kubernetes`](./modules/mod-104-kubernetes) |
+
 #### Projects
 
 | Code | Project | Path |

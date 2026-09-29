@@ -49,7 +49,7 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 | GPU Computing | mod-107-gpu-computing | 3 | 28-36 | GPU management & optimization |
 | Monitoring | mod-108-monitoring-observability | 2 | 20-26 | Observability & ML metrics |
 | Infrastructure as Code | mod-109-infrastructure-as-code | 2 | 20-26 | Terraform & Pulumi |
-| LLM Infrastructure | mod-110-llm-infrastructure | 2 | 38-48 | LLM serving & RAG |
+| LLM Infrastructure | [`mod-110-llm-infrastructure`](./modules/mod-110-llm-infrastructure) | 2 | 38-48 | LLM serving & RAG |
 
 #### Modules
 

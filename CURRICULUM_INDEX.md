@@ -40,7 +40,7 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 
 | Module | Code | Exercises | Total Hours | Primary Focus |
 |--------|------|-----------|-------------|---------------|
-| Foundations | mod-101-foundations | 3 | 18-24 | Advanced tooling & frameworks |
+| Foundations | [`mod-101-foundations`](./modules/mod-101-foundations) | 3 | 18-24 | Advanced tooling & frameworks |
 | Cloud Computing | mod-102-cloud-computing | 3 | 24-30 | Multi-cloud & cost optimization |
 | Containerization | [`mod-103-containerization`](./modules/mod-103-containerization) | 3 | 20-26 | Security & optimization |
 | Kubernetes | mod-104-kubernetes | 3 | 26-34 | Advanced orchestration |

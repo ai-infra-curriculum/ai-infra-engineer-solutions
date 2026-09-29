@@ -46,7 +46,7 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 | Kubernetes | mod-104-kubernetes | 3 | 26-34 | Advanced orchestration |
 | Data Pipelines | mod-105-data-pipelines | 2 | 22-28 | Streaming & workflow |
 | MLOps | [`mod-106-mlops`](./modules/mod-106-mlops) | 3 | 24-32 | Production ML lifecycle |
-| GPU Computing | mod-107-gpu-computing | 3 | 28-36 | GPU management & optimization |
+| GPU Computing | [`mod-107-gpu-computing`](./modules/mod-107-gpu-computing) | 3 | 28-36 | GPU management & optimization |
 | Monitoring | mod-108-monitoring-observability | 2 | 20-26 | Observability & ML metrics |
 | Infrastructure as Code | mod-109-infrastructure-as-code | 2 | 20-26 | Terraform & Pulumi |
 | LLM Infrastructure | mod-110-llm-infrastructure | 2 | 38-48 | LLM serving & RAG |

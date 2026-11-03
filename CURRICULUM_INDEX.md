@@ -41,14 +41,14 @@ This index provides a comprehensive overview of all 26 exercises, their relation
 | Module | Code | Exercises | Total Hours | Primary Focus |
 |--------|------|-----------|-------------|---------------|
 | Foundations | [`mod-101-foundations`](./modules/mod-101-foundations) | 3 | 18-24 | Advanced tooling & frameworks |
-| Cloud Computing | mod-102-cloud-computing | 3 | 24-30 | Multi-cloud & cost optimization |
+| Cloud Computing | [`mod-102-cloud-computing`](./modules/mod-102-cloud-computing) | 3 | 24-30 | Multi-cloud & cost optimization |
 | Containerization | [`mod-103-containerization`](./modules/mod-103-containerization) | 3 | 20-26 | Security & optimization |
-| Kubernetes | mod-104-kubernetes | 3 | 26-34 | Advanced orchestration |
-| Data Pipelines | mod-105-data-pipelines | 2 | 22-28 | Streaming & workflow |
+| Kubernetes | [`mod-104-kubernetes`](./modules/mod-104-kubernetes) | 3 | 26-34 | Advanced orchestration |
+| Data Pipelines | [`mod-105-data-pipelines`](./modules/mod-105-data-pipelines) | 2 | 22-28 | Streaming & workflow |
 | MLOps | [`mod-106-mlops`](./modules/mod-106-mlops) | 3 | 24-32 | Production ML lifecycle |
 | GPU Computing | [`mod-107-gpu-computing`](./modules/mod-107-gpu-computing) | 3 | 28-36 | GPU management & optimization |
-| Monitoring | mod-108-monitoring-observability | 2 | 20-26 | Observability & ML metrics |
-| Infrastructure as Code | mod-109-infrastructure-as-code | 2 | 20-26 | Terraform & Pulumi |
+| Monitoring | [`mod-108-monitoring-observability`](./modules/mod-108-monitoring-observability) | 2 | 20-26 | Observability & ML metrics |
+| Infrastructure as Code | [`mod-109-infrastructure-as-code`](./modules/mod-109-infrastructure-as-code) | 2 | 20-26 | Terraform & Pulumi |
 | LLM Infrastructure | [`mod-110-llm-infrastructure`](./modules/mod-110-llm-infrastructure) | 2 | 38-48 | LLM serving & RAG |
 
 #### Modules

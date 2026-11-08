@@ -95,7 +95,7 @@ ai-infra-engineer-solutions/
 
 1. **Clone this repository:**
    ```bash
-   git clone https://github.com/ai-infra-curriculum/ai-infra-engineer-solutions.git
+   git clone https://github.com/ai-infra-curriculum/ai-infra-engineer-solutions
    cd ai-infra-engineer-solutions
    ```
 

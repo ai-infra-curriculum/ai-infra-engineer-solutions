@@ -143,7 +143,7 @@ Code contributions are highly valued! Here are areas where contributions are esp
 
 3. **Add upstream remote:**
    ```bash
-   git remote add upstream https://github.com/ai-infra-curriculum/ai-infra-engineer-solutions.git
+   git remote add upstream https://github.com/ai-infra-curriculum/ai-infra-engineer-solutions
    ```
 
 4. **Create a development branch:**

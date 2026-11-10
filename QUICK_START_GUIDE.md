@@ -189,11 +189,11 @@ Week 16-18: mod-110 LLM Infrastructure
 
 ```bash
 # Clone the solutions repository
-git clone https://github.com/ai-infra-curriculum/ai-infra-engineer-solutions.git
+git clone https://github.com/ai-infra-curriculum/ai-infra-engineer-solutions
 cd ai-infra-engineer-solutions
 
 # Optional: Clone the learning repository too
-git clone https://github.com/ai-infra-curriculum/ai-infra-engineer-learning.git
+git clone https://github.com/ai-infra-curriculum/ai-infra-engineer-learning
 ```
 
 ### Step 2: Set Up Local Kubernetes
